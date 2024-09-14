@@ -35,9 +35,11 @@ export default function RootLayout({
 			<body className="flex flex-col h-screen">
 				<Header />
 				<NavLinks />
-				<main className="relative flex min-h-screen flex-col p-6 mb-auto">{children}</main>
+				<main className="mb-auto relative flex min-h-screen flex-col mr-6 ml-6">{children}</main>
 				<Footer />
 			</body>
 		</html>
 	);
+	
+	//TODO: footer isn't staying on the bottom
 }

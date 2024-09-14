@@ -1,9 +1,11 @@
 
+/* npm run dev */
+
 import SplashImage from '@/app/ui/splash-image';
 import FrequentBands from '@/app/ui/frequent-bands';
 import Link from 'next/link';
 import { Suspense } from 'react'
-import { FrequentBandSkeleton } from '@/app/ui/skeletons';
+import FrequentBandSkeleton from '@/app/ui/skeletons';
 
 export default function Page(){
 	return (

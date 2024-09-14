@@ -1,10 +1,10 @@
 
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import { fetchFrequentBands } from '@/app/lib/data';
 
 export default async function FrequentBands(){
 	const bands = await fetchFrequentBands();
-	console.warn('bands', bands, typeof bands);
+//	console.warn('bands', bands, typeof bands);
 	return (
 		<>
 			{bands.map(bandname=>{
@@ -22,9 +22,4 @@ export function Logo({ name }: { name: string; }){
 			<Image src={'/images/artists/square/'+name} alt={name} layout='fill' objectFit='contain' />
 		</div>
 	);
-	//this works:  <Image src={'/images/artists/square/'+name} alt={name} layout='fill' objectFit='contain' />
-	//however produces this error: 
-	//  Image with src "/images/artists/square/HypervisorLogo.JPG" has legacy prop "layout". Did you forget to run the codemod?
-	//  Image with src "/images/artists/square/HypervisorLogo.JPG" has legacy prop "objectFit". Did you forget to run the codemod?
-
 }
