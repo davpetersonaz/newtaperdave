@@ -1,6 +1,5 @@
 
 'use client' // Error boundaries must be Client Components
-/* eslint react/no-unused-vars */
 
 export default function GlobalError({ error, reset }: {
 	error: Error & { digest?: string }
