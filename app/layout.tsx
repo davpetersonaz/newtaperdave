@@ -1,5 +1,4 @@
 
-import localFont from "next/font/local";
 import "./globals.css";
 import { NavLinks } from '@/app/ui/nav-links';
 import Header from './header';

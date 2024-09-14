@@ -16,7 +16,7 @@ export default async function FrequentBands(){
 
 //using the Image tag in the default function is not allowed, it makes this file a client component (somehow)
 export function Logo({ name }: { name: string; }){
-	const postfix = name.split('.').pop();
+//	const postfix = name.split('.').pop();
 	return (
 		<div className="relative h-40 w-64 gap-4 mt-4">
 			<Image src={"/images/artists/square/"+name} alt={name} layout="fill" objectFit="contain" />
