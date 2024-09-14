@@ -1,6 +1,7 @@
 
 import Link from 'next/link';
-import { FaTwitter, FaGithub, FaLinkedin } from 'react-icons/fa';
+import { FaTwitter, FaGithub } from 'react-icons/fa';
+//import { FaTwitter, FaGithub, FaLinkedin } from 'react-icons/fa';
 
 // Define the Header component
 export default function Header(){
