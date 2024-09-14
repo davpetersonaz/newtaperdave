@@ -6,13 +6,15 @@ import Link from 'next/link';
  
 export function NavLinks(){
 	const pathname = usePathname();
+//	console.info('pathname', pathname);
 	return (
-		<nav>
+		<nav className='p-6'>
 			<Link className={`link ${pathname === '/' ? 'active' : ''}`} href="/">
-				Home
+				<span className='underline'>Home</span>
 			</Link>
+			&nbsp;|&nbsp;
 			<Link className={`link ${pathname === '/showlist' ? 'active' : ''}`} href="/showlist">
-				Shows List
+				<span className='underline'>Shows List</span>
 			</Link>
 		</nav>
 	)

@@ -35,11 +35,9 @@ export default function RootLayout({
 			<body className="flex flex-col h-screen">
 				<Header />
 				<NavLinks />
-				<main className="mb-auto">{children}</main>
+				<main className="relative flex min-h-screen flex-col p-6 mb-auto">{children}</main>
 				<Footer />
 			</body>
 		</html>
 	);
 }
-//formerly was: 
-//<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
