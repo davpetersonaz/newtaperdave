@@ -29,7 +29,7 @@ export async function fetchFrequentBands(){
 				'DigginDirtLogo.png', 'EndoplasmicLogo.jpg', 'HypervisorLogo.JPG', 'LeftonWilsonLogo.jpg',
 				'LotusLogo.jpg', 'MotetLogo.jpg', 'OrgoneLogo.jpg', 'PlanckLogo.jpg', 'ReebleJarLogo.jpg',
 				'SpaffordLogo.png', 'SpunjLogo.jpg', 'StringCheeseIncidentLogo.jpg',
-				'TurkuazLogo.jpg', 'UmphreysMcGeeLogo.jpg', 'UpstateQuartetLogo.jpg'
+				'TurkuazLogo.jpg', 'UpstateQuartetLogo.jpg'
 		];
 //		console.warn('unshuffled', unshuffled);
 		//This is the "Schwartzian transform" shuffle in js

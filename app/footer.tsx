@@ -2,7 +2,7 @@
 //import { FaGithub, FaTwitter } from 'react-icons/fa';
 
 // Define the Footer component
-export default function Footer() {
+export default function Footer(){
 	return (
 		<footer className="bg-gray-900 text-white py-4 z-50">
 			{/* First section of the footer */}

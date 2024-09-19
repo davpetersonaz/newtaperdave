@@ -14,7 +14,7 @@ export default function Page(){
 			<div className="flex flex-col space-y-3 pt-6 mx-[20%]">
 				<p>
 					<span className="font-bold">A quick note about taping live bands...</span>{" "}
-					The bands I record are <span className="italic">`&apos;`taper-friendly`&apos;`</span>, they follow the tradition set forth by the Grateful Dead{" "}
+					The bands I record are <span className="italic">"taper-friendly"</span>, they follow the tradition set forth by the Grateful Dead{" "}
 					that <span className="italic">live audience recordings</span> are beneficial to the promotion and success of a touring band,{" "}
 					especially those who throw a lot of improvisation into their sets{" "}
 					(and therefore appreciate having their accomplishments preserved so they can relisten to what they brought forth).
@@ -37,12 +37,12 @@ export default function Page(){
 				<p>
 					I will eventually put everything on{" "}
 					<Link href="https://archive.org/details/@taper-dave">The Internet Archive</Link>,{" "}
-					however I`&apos;`ll probably be somewhat selective on that so it will happen slowly (as I catch up with backlog).
+					however {"I'll"} probably be somewhat selective on that so it will happen slowly (as I catch up with backlog).
 				</p>
 				<p>
 					Keep in mind some recordings are better than others for a variety of reasons{" "}
 					(the microphones, the placement, the room, me, the soundguy, the amps, etc).{" "}
-					Generally, the older the recording, the higher the likelihood it might not be `&apos;`that great`&apos;`,{" "}
+					Generally, the older the recording, the higher the likelihood it might not be "that great",{" "}
 					I have provided samples of each show so you can take a quick listen before downloading.{" "}
 					For your reference, the progression of equipment I have used started with the ZoomH4n, then the ZoomH6 for a brief period, then the ZoomH5,{" "}
 					then I purchased some good external mics, first were Audio Technica 853 microphones, and most recently my new Golden Age Project FC4 condenser mics.
@@ -53,13 +53,13 @@ export default function Page(){
 					And, <span className="italic">buy their merchandise!</span>{" "}
 					And buy their studio albums -- alot of these bands exhibit different sides of themselves in the studio vs on the road!{" "}
 					They are great people and love to get down and have a good time,{" "}
-					and a recording can only capture <span className="italic">one</span> aspect of a band`&apos;`s performance,{" "}
+					and a recording can only capture <span className="italic">one</span> aspect of a {"band's"} performance,{" "}
 					so go experience the <span className="italic">whole thing</span> for yourself!!
 				</p>
 			</div>
 			<div className="text-center mt-8">
 				<Link href="https://taperdave.com/showlist.php?s=y"><span className="text-xl">And On to The Music!</span></Link>
-				<p className="text-center">here are some of the bands I`&apos;`ve taped the most</p>
+				<p className="text-center">here are some of the bands {"I've"} taped the most</p>
 				<div className="flex flex-row flex-wrap justify-around">
 					<Suspense fallback={<FrequentBandSkeleton />}>
 						<FrequentBands />

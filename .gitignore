@@ -1,6 +1,7 @@
 /build
 /coverage
 .DS_Store
+.env
 .env*.local
 /.git/
 /nbproject/
