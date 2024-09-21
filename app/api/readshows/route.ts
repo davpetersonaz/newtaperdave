@@ -3,13 +3,15 @@ import conn from '@/lib/db';
 import fs from 'fs';
 import { existsSync } from 'fs';
 import fsp from 'fs/promises';
-import path from 'path'
-import { NextResponse } from 'next/server'
+import path from 'path';
+import { NextResponse } from 'next/server';
 import { removeAllShows, addShow } from './database';
+import sizeOf from 'image-size';
 
 export async function GET(request: Request): Response{
 //	console.warn('readShowFiles');
 	try{
+		//reset these
 		MISSING_ARCHIVE = [];
 		MISSING_ARTIST_IMG = [];
 		MISSING_PCLOUD = [];
@@ -27,16 +29,24 @@ export async function GET(request: Request): Response{
 			console.warn('importing', filename);
 			const fileContents = await readFile(filename);
 			const showInfo = {};
-			showInfo.source = getSource(fileContents, filename);
+			showInfo.sources = getSource(fileContents, filename);
 			showInfo.artist = fileContents.shift().trim();
 			showInfo.artist_sort = getArtistSort(showInfo.artist);
-			showInfo.artist_image = getArtistImage(showInfo.artist);
+			const artist_images = getArtistImages(showInfo.artist);
+			showInfo.artist_wide = artist_images.wide_image;
+			showInfo.artist_wide_h = artist_images.wide_height;
+			showInfo.artist_wide_w = artist_images.wide_width;
+			showInfo.artist_square = artist_images.square_image;
+			showInfo.artist_square_h = artist_images.square_height;
+			showInfo.artist_square_w = artist_images.square_width;
 			const { showdate, showdateplus } = getShowDate(fileContents.shift().trim());
 			showInfo.showdate = showdate;
 			const logger = showInfo.artist + ' :: ' + showInfo.showdate;
-			const { venue, venue_image } = getVenue(fileContents.shift().trim(), logger);
-			showInfo.venue = venue;
-			showInfo.venue_image = venue_image;
+			const venue = getVenue(fileContents.shift().trim(), logger);
+			showInfo.venue = venue.name;
+			showInfo.venue_logo = venue.image;
+			showInfo.venue_logo_h = venue.height;
+			showInfo.venue_logo_w = venue.width;
 			const { city, city_state } = getCity(fileContents.shift().trim());
 			showInfo.city = city;
 			showInfo.city_state = city_state;
@@ -135,15 +145,34 @@ function getArtistSort(line: String):String{
 	return result;
 }
 
-function getArtistImage(artist: String):String{
-	let result = artist;
-	if(artist.substring(0, 4) === 'The '){ result = artist.substring(4) + 'The'; }
-	result = result.replace(/[\W_]+/g, '') + 'Logo';
-	const files = fs.readdirSync(ARTIST_WIDE_IMG_PATH).filter(fn => fn.startsWith(result));
+function getArtistImages(artist: String):Array{
+	let result = [];
+	result.square_image = '', result.square_height = 0,  result.square_width = 0;
+	result.wide_image = '', result.wide_height = 0, result.wide_width = 0;
+	let wip = artist;
+	if(wip.substring(0, 4) === 'The '){ wip = wip.substring(4) + 'The'; }
+	wip = wip.replace(/[\W_]+/g, '') + 'Logo';
+	
+	let files = fs.readdirSync(ARTIST_WIDE_IMG_PATH).filter(fn => fn.startsWith(wip));
 	if(files.length > 0){
-		result = files.shift();
+		result.wide_image = files.shift();
+		const dimensions = sizeOf(ARTIST_WIDE_IMG_PATH + result.wide_image);
+		result.wide_height = dimensions.height;
+		result.wide_width = dimensions.width;
 	}else{
-		MISSING_ARTIST_IMG.push(`${artist} :: ${result}`); }
+		MISSING_ARTIST_IMG.push(`${artist} :: ${wip}`);
+	}
+
+	files = fs.readdirSync(ARTIST_SQUARE_IMG_PATH).filter(fn => fn.startsWith(wip));
+	if(files.length > 0){
+		result.square_image = files.shift();
+		const dimensions = sizeOf(ARTIST_SQUARE_IMG_PATH + result.square_image);
+		result.square_height = dimensions.height;
+		result.square_width = dimensions.width;
+	}else{
+		//i dont really care if missing square images, it will be obvious on the homepage if one is needed.
+	}
+
 	return result;	
 }
 
@@ -157,13 +186,16 @@ function getShowDate(line: String):Array{
 
 function getVenue(line: String, logger: String):String{
 	let result = [];
-	result.venue = line;
-	result.venue_image = '';
+	result.name = line;
+	result.image = '', result.height = 0, result.width = 0;
 	if(line.substring(0, 4) === 'The '){ line = line.substring(4) + 'The'; }
 	const stripped = line.replace(/[\W_]+/g, '') + 'Logo';
 	const files = fs.readdirSync(VENUE_IMG_PATH).filter(fn => fn.startsWith(stripped));
 	if(files.length > 0){
-		result.venue_image = files.shift();
+		result.image = files.shift();
+		const dimensions = sizeOf(VENUE_IMG_PATH + result.image);
+		result.height = dimensions.height;
+		result.width = dimensions.width;
 	}else{
 		MISSING_VENUE_IMG.push(`${stripped} :: ${logger}`);
 	}
@@ -233,6 +265,7 @@ async function writeLogFile(filename: String, data: Array){
 	console.warn('wrote log file', filename);
 }
 
+const ARTIST_SQUARE_IMG_PATH = './public/images/artists/square/';
 const ARTIST_WIDE_IMG_PATH = './public/images/artists/wide/';
 const MP3_PATH = './public/music/';
 const OUTPUT_PATH = './public/output/';
