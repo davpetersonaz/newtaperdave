@@ -5,50 +5,62 @@ import { existsSync } from 'fs';
 import fsp from 'fs/promises';
 import path from 'path'
 import { NextResponse } from 'next/server'
+import { removeAllShows, addShow } from './database';
 
-const PATH = './public/files/';
-	
 export async function GET(request: Request): Response{
 //	console.warn('readShowFiles');
 	try{
+		MISSING_ARCHIVE = [];
+		MISSING_ARTIST_IMG = [];
+		MISSING_PCLOUD = [];
+		MISSING_SAMPLES = [];
+		MISSING_VENUE_IMG = [];
+		UNKNOWN_SOURCE = [];
+
 		const filenames = await getFilenames();
 //		console.warn('filenames', filenames);
 		
-		//TODO: remove all shows from DB
+		removeAllShows();
 		
-		let showInfo = {};//TODO: remove this after i've removed the 'break' in the following loop
-		let fileContents = '>nothing<';
+		let inc = 0;
 		for(const filename of filenames){
-//			console.warn('filename', filename);
-			fileContents = await readFile(filename);
-			showInfo = {};//TODO: just initiate it here as a const once i'm no longer exporting it in the response
-			showInfo.source = getSource(fileContents);
+			console.warn('importing', filename);
+			const fileContents = await readFile(filename);
+			const showInfo = {};
+			showInfo.source = getSource(fileContents, filename);
 			showInfo.artist = fileContents.shift().trim();
 			showInfo.artist_sort = getArtistSort(showInfo.artist);
+			showInfo.artist_image = getArtistImage(showInfo.artist);
 			const { showdate, showdateplus } = getShowDate(fileContents.shift().trim());
 			showInfo.showdate = showdate;
-			showInfo.showdateplus = showdateplus;
-			const logger = showInfo.artist+' '+showInfo.showdate;
-			showInfo.venue = fileContents.shift().trim();
+			const logger = showInfo.artist + ' :: ' + showInfo.showdate;
+			const { venue, venue_image } = getVenue(fileContents.shift().trim(), logger);
+			showInfo.venue = venue;
+			showInfo.venue_image = venue_image;
 			const { city, city_state } = getCity(fileContents.shift().trim());
 			showInfo.city = city;
 			showInfo.city_state = city_state;
 			const { pcloud, archive } = getLinks(fileContents, logger);
-			showInfo.pcloud = pcloud;
-			showInfo.archive = archive;
-			showInfo.the_rest = getTheRest(fileContents);
-			showInfo.sample_file = getSampleFile(showInfo.artist, showInfo.showdate, showInfo.showdateplus);
-
+			showInfo.pcloudlink = pcloud;
+			showInfo.archivelink = archive;
+			showInfo.setlist = JSON.stringify(getTheRest(fileContents));
+			showInfo.samplefile = getSampleFile(showInfo.artist, showInfo.showdate, showdateplus);
 			console.warn('showInfo', showInfo);
-			
-			//TODO: add showInfo to DB
-			
-			break;//TODO: remove when ready to suck in all shows
+			const result = addShow(showInfo);
+			inc++;
 		}
-		return NextResponse.json(showInfo);
+		
+		writeLogFile('missing_archive_links.txt', MISSING_ARCHIVE);
+		writeLogFile('missing_artist_imgs.txt', MISSING_ARTIST_IMG);
+		writeLogFile('missing_pcloud_links.txt', MISSING_PCLOUD);
+		writeLogFile('missing_sample_files.txt', MISSING_SAMPLES);
+		writeLogFile('missing_venue_imgs.txt', MISSING_VENUE_IMG);
+		writeLogFile('unknown_sources.txt', UNKNOWN_SOURCE);
+		
+		return NextResponse.json(`imported ${inc} shows into db`);
 	}catch(error){
 		console.error('FileSystem Error:', error);
-		throw new Error('Failed to retrieve show filenames.');
+		throw new Error('Failed to Read Shows into DB.');
 	}
 }
 
@@ -69,7 +81,7 @@ async function readFile(filename: String):String{
 	return result;
 }
 
-function getSource(fileContents: Array):String{
+function getSource(fileContents: Array, filename: String):String{
 	const sourceLine = fileContents.filter(line => line.includes("source: "))[0];
 	let source = OTHER;
 	if(sourceLine){
@@ -99,10 +111,12 @@ function getSource(fileContents: Array):String{
 		}else if(sourceLower.includes('mbho')){
 			source = MBHO;
 		}else{
-			console.warn("ERROR: unknown source: "+filename);
+			console.warn("ERROR: unknown source", filename);
+			UNKNOWN_SOURCE.push(`${filename} :: ${sourceLine}`);
 		}
 	}else{
-		console.warn("ERROR: no source field: "+filename);
+		console.warn("ERROR: no source field", filename);
+		UNKNOWN_SOURCE.push(`${filename} :: >no source<`);
 	}
 	return source;
 }
@@ -110,23 +124,50 @@ function getSource(fileContents: Array):String{
 function getArtistSort(line: String):String{
 	let result = line;
 	if(line.substring(0, 4).toLowerCase() === 'the '){
-		result = line.substring(4)+', The';
+		result = line.substring(4) + ', The';
 	}else
 	if(line.substring(0, 2).toLowerCase() === 'a '){
-		result = line.substring(2)+', A';
+		result = line.substring(2) + ', A';
 	}else
 	if(line.substring(0, 3).toLowerCase() === 'an '){
-		result = line.substring(3)+', An';
+		result = line.substring(3) + ', An';
 	}
 	return result;
+}
+
+function getArtistImage(artist: String):String{
+	let result = artist;
+	if(artist.substring(0, 4) === 'The '){ result = artist.substring(4) + 'The'; }
+	result = result.replace(/[\W_]+/g, '') + 'Logo';
+	const files = fs.readdirSync(ARTIST_WIDE_IMG_PATH).filter(fn => fn.startsWith(result));
+	if(files.length > 0){
+		result = files.shift();
+	}else{
+		MISSING_ARTIST_IMG.push(`${artist} :: ${result}`); }
+	return result;	
 }
 
 function getShowDate(line: String):Array{
 	let result = [];
 	const found = line.match(/^.*(\d\d)\-(\d\d)\-(\d\d)(.*)$/);
-	result.showdate = '20'+found[3]+"-"+found[1]+"-"+found[2];
+	result.showdate = '20' + found[3] + "-" + found[1] + "-" + found[2];
 	result.showdateplus = (found[4] ? found[4] : '');//only used to find the mp3 sample, at this point, not saved to db
 	return result;
+}
+
+function getVenue(line: String, logger: String):String{
+	let result = [];
+	result.venue = line;
+	result.venue_image = '';
+	if(line.substring(0, 4) === 'The '){ line = line.substring(4) + 'The'; }
+	const stripped = line.replace(/[\W_]+/g, '') + 'Logo';
+	const files = fs.readdirSync(VENUE_IMG_PATH).filter(fn => fn.startsWith(stripped));
+	if(files.length > 0){
+		result.venue_image = files.shift();
+	}else{
+		MISSING_VENUE_IMG.push(`${stripped} :: ${logger}`);
+	}
+	return result;	
 }
 
 function getCity(line: String):Array{
@@ -150,8 +191,14 @@ function getLinks(fileContents: Array, logger: String):Array{
 		}
 		possibleLink = fileContents.shift().trim();
 	}
-	if(!result.pcloud){ console.warn('MISSING: pcloud link', logger); }
-	if(!result.archive){ console.warn('MISSING: archive link', logger); }
+	if(!result.pcloud){ 
+		console.warn('MISSING: pcloud link', logger); 
+		MISSING_PCLOUD.push(logger);
+	}
+	if(!result.archive){ 
+		console.warn('MISSING: archive link', logger); 
+		MISSING_ARCHIVE.push(logger);
+	}
 	return result;
 }
 
@@ -163,18 +210,42 @@ function getTheRest(fileContents: Array):Array{
 	return result;
 }
 
-function getSampleFile(artist: String, showdate: String, showdateplus: String	):String{
+function getSampleFile(artist: String, showdate: String, showdateplus: String):String{
 	let result = '';
-	const artist_stripped = artist.replace(/[\W_]+/g, '').toLowerCase();
-	let possibleSampleFileUrl = './public/music/'+artist_stripped+showdate+showdateplus+'.mp3';
-	console.warn('possibleSampleFileUrl', possibleSampleFileUrl);
-	if(existsSync(possibleSampleFileUrl)){
-		result = possibleSampleFileUrl;
+	const artist_temp = (artist.substring(0, 4) === 'The ' ? artist.substring(4) + ', The' : artist);
+	const artist_stripped = artist_temp.replace(/[\W_]+/g, '').toLowerCase();
+	const possibleSampleFile = artist_stripped + showdate + showdateplus + '.mp3';
+	console.warn('possibleSampleFile', possibleSampleFile);
+	if(existsSync(MP3_PATH + possibleSampleFile)){
+		result = MP3_PATH + possibleSampleFile;
 	}else{
-		console.warn('MISSING: sample file', possibleSampleFileUrl );
+		console.warn('MISSING: sample file', possibleSampleFile);
+		MISSING_SAMPLES.push(`${possibleSampleFile} :: ${artist} :: ${showdate}`);
 	}
 	return result;
 }
+
+async function writeLogFile(filename: String, data: Array){
+	let output = '';
+	data.sort();
+	data.forEach((line) => output = output + line + '\n');
+	await fs.writeFileSync(OUTPUT_PATH + filename, output);
+	console.warn('wrote log file', filename);
+}
+
+const ARTIST_WIDE_IMG_PATH = './public/images/artists/wide/';
+const MP3_PATH = './public/music/';
+const OUTPUT_PATH = './public/output/';
+const PATH = './public/files/';
+const VENUE_IMG_PATH = './public/images/venues/';
+	
+//logging files
+let MISSING_ARCHIVE = [];
+let MISSING_ARTIST_IMG = [];
+let MISSING_PCLOUD = [];
+let MISSING_SAMPLES = [];
+let MISSING_VENUE_IMG = [];
+let UNKNOWN_SOURCE = [];
 
 //these should be in the order i want them displayed on the "sort by source" page...
 //NOTE: changing these requires a change to the database as well
