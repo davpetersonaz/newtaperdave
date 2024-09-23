@@ -153,26 +153,30 @@ function getArtistImages(artist: String):Array{
 	if(wip.substring(0, 4) === 'The '){ wip = wip.substring(4) + 'The'; }
 	wip = wip.replace(/[\W_]+/g, '') + 'Logo';
 	
+	console.warn('ARTIST_WIDE_IMG_PATH', ARTIST_WIDE_IMG_PATH);
 	let files = fs.readdirSync(ARTIST_WIDE_IMG_PATH).filter(fn => fn.startsWith(wip));
 	if(files.length > 0){
-		result.wide_image = files.shift();
-		const dimensions = sizeOf(ARTIST_WIDE_IMG_PATH + result.wide_image);
+		result.wide_image = ARTIST_WIDE_IMG_PATH +files.shift();
+		const dimensions = sizeOf(result.wide_image);
 		result.wide_height = dimensions.height;
 		result.wide_width = dimensions.width;
+		result.wide_image = result.wide_image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
 	}else{
 		MISSING_ARTIST_IMG.push(`${artist} :: ${wip}`);
 	}
 
 	files = fs.readdirSync(ARTIST_SQUARE_IMG_PATH).filter(fn => fn.startsWith(wip));
 	if(files.length > 0){
-		result.square_image = files.shift();
-		const dimensions = sizeOf(ARTIST_SQUARE_IMG_PATH + result.square_image);
+		result.square_image = ARTIST_SQUARE_IMG_PATH + files.shift();
+		const dimensions = sizeOf(result.square_image);
 		result.square_height = dimensions.height;
 		result.square_width = dimensions.width;
+		result.square_image = result.square_image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
 	}else{
 		//i dont really care if missing square images, it will be obvious on the homepage if one is needed.
 	}
 
+	console.warn('returning result', result);
 	return result;	
 }
 
@@ -192,10 +196,11 @@ function getVenue(line: String, logger: String):String{
 	const stripped = line.replace(/[\W_]+/g, '') + 'Logo';
 	const files = fs.readdirSync(VENUE_IMG_PATH).filter(fn => fn.startsWith(stripped));
 	if(files.length > 0){
-		result.image = files.shift();
-		const dimensions = sizeOf(VENUE_IMG_PATH + result.image);
+		result.image = VENUE_IMG_PATH + files.shift();
+		const dimensions = sizeOf(result.image);
 		result.height = dimensions.height;
 		result.width = dimensions.width;
+		result.image = result.image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
 	}else{
 		MISSING_VENUE_IMG.push(`${stripped} :: ${logger}`);
 	}

@@ -20,7 +20,7 @@ export default function RootLayout({
 ) {
 	return (
 		<html lang="en">
-			<body className="flex flex-col h-screen">
+			<body className="flex flex-col h-screen text-gray-900 bg-gray-100">
 				<Header />
 				<NavLinks />
 				<main className="mb-auto relative flex min-h-screen flex-col mr-6 ml-6">{children}</main>
