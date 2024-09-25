@@ -16,5 +16,8 @@ const config: Config = {
     },
   },
   plugins: [],
+  utilities: {
+    border: ['responsive'], /* still can't get borders to display?? */
+  }
 };
 export default config;

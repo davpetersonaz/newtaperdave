@@ -8,41 +8,48 @@ export default async function Page({ params }: { params: { artist: string, showd
 	const showinfo = await getShow(decodeURIComponent(params.artist), params.showdate, params.source);
 	console.warn('showinfo', showinfo);
 	const artist_image = (showinfo.artist_square === '' 
-			? <><p className='text-4xl font-bold'>{showinfo.artist}</p></> 
-			: <><Image src={showinfo.artist_square} alt={showinfo.artist} height={showinfo.artist_square_h} width={showinfo.artist_square_w}/></>);
+			? (<p className='text-4xl font-bold'>{showinfo.artist}</p>) 
+			: (<Image src={showinfo.artist_square} alt={showinfo.artist} height={showinfo.artist_square_h} width={showinfo.artist_square_w} className='mx-auto pb-4'/>) );
 	const venue_image = (showinfo.venue_logo === '' 
-			? <><p className='text-4xl font-bold'>{showinfo.venue}</p></>
-			: <><Image src={showinfo.venue_logo} alt={showinfo.venue} height={showinfo.venue_logo_h} width={showinfo.venue_logo_w}/></>);
+			? (<p className='text-4xl font-bold'>{showinfo.venue}</p>)
+			: (<Image src={showinfo.venue_logo} alt={showinfo.venue} height={showinfo.venue_logo_h} width={showinfo.venue_logo_w} className='mx-auto pt-4 pb-8'/>) );
 	const pcloud_link = (showinfo.pcloudlink === '' 
 			? <></>
-			: <><Link href={showinfo.pcloudlink}>Link to MP3 Download on pCloud</Link></>);
+			:(<Link href={showinfo.pcloudlink} className='pb-8'>Link to MP3 Download on pCloud</Link>));
 	const sample = (showinfo.samplefile === ''
-			? <></>
+			?	<></>
 			:	<>
-					<p>20-second sample</p>
-					<audio controls className='w-300 h-54 border-1 border-black border-solid rounded m-4 bg-gray-300'>
-						<source src={showinfo.samplefile} type='audio/mpeg' className='' />
-					</audio>
+					<div className='pt-8'>
+						<p>20-second sample</p>
+						<audio controls className='w-300 h-54 m-4 mx-auto border-1 border-black border-solid rounded m-0'>
+							<source src={showinfo.samplefile} type='audio/mpeg' className='' />
+						</audio>
+					</div>
 				</>);
 	const setlist = JSON.parse(showinfo.setlist);
 	let i = 1;
 	const setlist_str = setlist.map(line => line === '' ? ( <br /> ) : ( <li key={i++}>{line === '' ? '  ' : line}</li> ) );
 	return (
-		<div className='flex flex-row flex-center'>
-			<div className='border-solid border-1 border-black text-center'>
-				{artist_image}
-				<p>at</p>
-				{venue_image}
-				{pcloud_link}
-				{sample}
-			</div>
-			<div className='border-solid border-1 border-black'>
-				<p className='text-4xl font-bold'>{showinfo.artist}</p>
-				<p className='text-3xl'>{showinfo.showdate}</p>
-				<p className='text-2xl'>{showinfo.venue}</p>
-				<p className='text-2xl'>{showinfo.city_state}</p>
-				<ul>{setlist_str}</ul>
-				
+		<div className='text-center'> 
+			<div className='grid grid-cols-2 gap-8'>
+				<div className='float-right'>
+					<div className='text-center'>
+						{artist_image}
+						<p>at</p>
+						{venue_image}
+						{pcloud_link}
+						{sample}
+					</div>
+				</div>
+				<div className='float-left'>
+					<div className='text-left'>
+						<p className='text-5xl font-bold pb-4'>{showinfo.artist}</p>
+						<p className='text-4xl pb-2'>{showinfo.showdate}</p>
+						<p className='text-3xl'>{showinfo.venue}</p>
+						<p className='text-2xl pb-8'>{showinfo.city_state}</p>
+						<ul>{setlist_str}</ul>
+					</div>
+				</div>
 			</div>
 		</div>
 	);
