@@ -13,7 +13,8 @@ export async function GET(request: Request): Response{
 	try{
 		//reset these
 		MISSING_ARCHIVE = [];
-		MISSING_ARTIST_IMG = [];
+		MISSING_ARTIST_SQUARE_IMG = [];
+		MISSING_ARTIST_WIDE_IMG = [];
 		MISSING_PCLOUD = [];
 		MISSING_SAMPLES = [];
 		MISSING_VENUE_IMG = [];
@@ -61,7 +62,8 @@ export async function GET(request: Request): Response{
 		}
 		
 		writeLogFile('missing_archive_links.txt', MISSING_ARCHIVE);
-		writeLogFile('missing_artist_imgs.txt', MISSING_ARTIST_IMG);
+		writeLogFile('missing_artist_wide_imgs.txt', MISSING_ARTIST_WIDE_IMG);
+		writeLogFile('missing_artist_square_imgs.txt', MISSING_ARTIST_SQUARE_IMG);
 		writeLogFile('missing_pcloud_links.txt', MISSING_PCLOUD);
 		writeLogFile('missing_sample_files.txt', MISSING_SAMPLES);
 		writeLogFile('missing_venue_imgs.txt', MISSING_VENUE_IMG);
@@ -152,18 +154,6 @@ function getArtistImages(artist: String):Array{
 	let wip = artist;
 	if(wip.substring(0, 4) === 'The '){ wip = wip.substring(4) + 'The'; }
 	wip = wip.replace(/[\W_]+/g, '') + 'Logo';
-	
-	console.warn('ARTIST_WIDE_IMG_PATH', ARTIST_WIDE_IMG_PATH);
-	let files = fs.readdirSync(ARTIST_WIDE_IMG_PATH).filter(fn => fn.startsWith(wip));
-	if(files.length > 0){
-		result.wide_image = ARTIST_WIDE_IMG_PATH +files.shift();
-		const dimensions = sizeOf(result.wide_image);
-		result.wide_height = dimensions.height;
-		result.wide_width = dimensions.width;
-		result.wide_image = result.wide_image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
-	}else{
-		MISSING_ARTIST_IMG.push(`${artist} :: ${wip}`);
-	}
 
 	files = fs.readdirSync(ARTIST_SQUARE_IMG_PATH).filter(fn => fn.startsWith(wip));
 	if(files.length > 0){
@@ -173,7 +163,18 @@ function getArtistImages(artist: String):Array{
 		result.square_width = dimensions.width;
 		result.square_image = result.square_image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
 	}else{
-		//i dont really care if missing square images, it will be obvious on the homepage if one is needed.
+		MISSING_ARTIST_SQUARE_IMG.push(`${artist} :: ${wip}`);
+	}
+	
+	let files = fs.readdirSync(ARTIST_WIDE_IMG_PATH).filter(fn => fn.startsWith(wip));
+	if(files.length > 0){
+		result.wide_image = ARTIST_WIDE_IMG_PATH +files.shift();
+		const dimensions = sizeOf(result.wide_image);
+		result.wide_height = dimensions.height;
+		result.wide_width = dimensions.width;
+		result.wide_image = result.wide_image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
+	}else{
+		MISSING_ARTIST_WIDE_IMG.push(`${artist} :: ${wip}`);
 	}
 
 	console.warn('returning result', result);
@@ -279,7 +280,8 @@ const VENUE_IMG_PATH = './public/images/venues/';
 	
 //logging files
 let MISSING_ARCHIVE = [];
-let MISSING_ARTIST_IMG = [];
+let MISSING_ARTIST_SQUARE_IMG = [];
+let MISSING_ARTIST_WIDE_IMG = [];
 let MISSING_PCLOUD = [];
 let MISSING_SAMPLES = [];
 let MISSING_VENUE_IMG = [];
