@@ -11,7 +11,7 @@ export default async function Page({ params }: { params: { artist: string, showd
 			? (<p className='text-4xl font-bold'>{showinfo.artist}</p>) 
 			: (<Image src={showinfo.artist_square} alt={showinfo.artist} height={showinfo.artist_square_h} width={showinfo.artist_square_w} className='mx-auto pb-4'/>) );
 	const venue_image = (showinfo.venue_logo === '' 
-			? (<p className='text-4xl font-bold'>{showinfo.venue}</p>)
+			? (<p className='text-3xl font-bold pb-8'>{showinfo.venue}</p>)
 			: (<Image src={showinfo.venue_logo} alt={showinfo.venue} height={showinfo.venue_logo_h} width={showinfo.venue_logo_w} className='mx-auto pt-4 pb-8'/>) );
 	const pcloud_link = (showinfo.pcloudlink === '' 
 			? <></>
@@ -19,9 +19,9 @@ export default async function Page({ params }: { params: { artist: string, showd
 	const sample = (showinfo.samplefile === ''
 			?	<></>
 			:	<>
-					<div className='pt-8'>
+					<div className='pt-8 border-3 border-black border-solid rounded'>
 						<p>20-second sample</p>
-						<audio controls className='w-300 h-54 m-4 mx-auto border-1 border-black border-solid rounded m-0'>
+						<audio controls className='w-300 h-54 m-0 mx-auto'>
 							<source src={showinfo.samplefile} type='audio/mpeg' className='' />
 						</audio>
 					</div>
@@ -31,9 +31,9 @@ export default async function Page({ params }: { params: { artist: string, showd
 	const setlist_str = setlist.map(line => line === '' ? ( <br /> ) : ( <li key={i++}>{line === '' ? '  ' : line}</li> ) );
 	return (
 		<div className='text-center'> 
-			<div className='grid grid-cols-2 gap-8'>
-				<div className='float-right'>
-					<div className='text-center'>
+			<div className='grid grid-cols-2 gap-16'>
+				<div className='text-center'>
+					<div className='float-right pt-8'>
 						{artist_image}
 						<p>at</p>
 						{venue_image}
