@@ -2,7 +2,7 @@
 import conn from './db';
 
 export async function getShowListAlpha(){
-	const query = "SELECT show_id, artist, artist_wide, artist_wide_h, artist_wide_w, showdate, venue, sources, archivelink, pcloudlink, samplefile FROM shows ORDER BY artist_sort ASC";
+	const query = "SELECT show_id, artist, artist_wide, artist_wide_h, artist_wide_w, showdate, venue, sources, archivelink, pcloudlink, samplefile FROM shows ORDER BY artist_sort ASC, showdate ASC";
 	const result = await conn.query(query);
 	return result.rows;
 }

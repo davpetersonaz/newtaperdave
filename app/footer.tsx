@@ -4,7 +4,7 @@
 // Define the Footer component
 export default function Footer(){
 	return (
-		<footer className="bg-gray-900 text-white py-4 z-50">
+		<footer className="bg-gray-900 text-white py-4 z-50 fixed left-0 bottom-0 right-0">
 			{/* First section of the footer */}
 			<div className="container mx-auto px-4 flex justify-between items-center">
 				{/* Display your name and the current year */}

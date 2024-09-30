@@ -4,6 +4,9 @@ import { NavLinks } from '@/app/ui/nav-links';
 import Header from './header';
 import Footer from './footer';
 import { Metadata } from 'next';
+import "@fortawesome/fontawesome-svg-core/styles.css"; // import Font Awesome CSS
+import { config } from "@fortawesome/fontawesome-svg-core";
+config.autoAddCss = false; // Tell Font Awesome to skip adding the CSS automatically since it's being imported above
 
 export const metadata: Metadata = {
 	title: {
@@ -23,7 +26,7 @@ export default function RootLayout({
 			<body className="flex flex-col h-screen text-gray-900 bg-gray-100">
 				<Header />
 				<NavLinks />
-				<main className="mb-auto relative flex min-h-screen flex-col mr-6 ml-6">{children}</main>
+				<main className="mb-auto relative flex pb-20 flex-col mr-6 ml-6">{children}</main>
 				<Footer />
 			</body>
 		</html>

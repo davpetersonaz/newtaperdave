@@ -4,6 +4,8 @@ import Link from 'next/link';
 import Image from "next/image";
 import { getShowListAlpha, getAllSources } from '../lib/database';
 import dateformat from "dateformat";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // FontAwesomeIcon component
+import { faFileArrowDown, faFileZipper, faPlay } from "@fortawesome/free-solid-svg-icons"; // individual icons necessary
 
 export const metadata: Metadata = {
 	title: 'List of Shows',
@@ -33,12 +35,14 @@ export default async function Page(){
 				console.warn('push more output');
 				output.push(
 					<div>
-						<div>
-							<Image src={artist.logo} alt={artist.name} height={artist.logo_h} width={artist.logo_w} className='mx-auto pb-4'/>
+						<div className='pb-4'>
+							<Image src={artist.logo} alt={artist.name} height={artist.logo_h} width={artist.logo_w} className='mx-auto border-2 border-black'/>
 						</div>
 						<ul className='pb-8'>
 							{shows.map((line) => (
-								<li key={line.show_id}><Link href={'/showinfo/'+artist.name+'/'+line.showdate+'/'+line.source_num}>{line.showdate} - {line.venue} - {line.source}</Link></li>
+								<li key={line.show_id}>
+									<Link href={'/showinfo/'+artist.name+'/'+line.showdate+'/'+line.source_num}>{line.showdate} - {line.venue} - {line.source}</Link> {line.pcloudlink} {line.archivelink} {line.samplefile}
+								</li>
 							))}
 						</ul>
 					</div>
@@ -66,6 +70,9 @@ export default async function Page(){
 //		console.warn('show source', show.sources);
 		line.source_num = show.sources;
 		line.source = sources.find(x => x.id === show.sources).sourcetext;
+		line.archivelink = (show.archivelink === '' ? <></> :	( <Link href={show.archivelink} target="_blank"> <FontAwesomeIcon icon={faFileZipper} /> </Link> ) );
+		line.pcloudlink =  (show.pcloudlink === '' ? <></> :	( <Link href={show.pcloudlink} target="_blank">  <FontAwesomeIcon icon={faFileArrowDown} /> </Link> ) );
+		line.samplefile =  (show.samplefile === '' ? <></> :	( <Link href={show.samplefile} target="_blank">  <FontAwesomeIcon icon={faPlay} /> </Link> ) );
 //		console.warn('source retrieved', line.source);
 		shows.push(line);
 		console.warn('shows updated', shows.length, line);

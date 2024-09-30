@@ -27,7 +27,7 @@ export default async function Page({ params }: { params: { artist: string, showd
 					</div>
 				</>);
 	const setlist = JSON.parse(showinfo.setlist);
-	let i = 1;
+	let i = 1;//the key is not going to change, and we have nothing else to use to uniquely identify the line.
 	const setlist_str = setlist.map(line => line === '' ? ( <br /> ) : ( <li key={i++}>{line === '' ? '  ' : line}</li> ) );
 	return (
 		<div className='text-center'> 

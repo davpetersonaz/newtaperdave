@@ -155,7 +155,7 @@ function getArtistImages(artist: String):Array{
 	if(wip.substring(0, 4) === 'The '){ wip = wip.substring(4) + 'The'; }
 	wip = wip.replace(/[\W_]+/g, '') + 'Logo';
 
-	files = fs.readdirSync(ARTIST_SQUARE_IMG_PATH).filter(fn => fn.startsWith(wip));
+	let files = fs.readdirSync(ARTIST_SQUARE_IMG_PATH).filter(fn => fn.startsWith(wip));
 	if(files.length > 0){
 		result.square_image = ARTIST_SQUARE_IMG_PATH + files.shift();
 		const dimensions = sizeOf(result.square_image);
@@ -166,7 +166,7 @@ function getArtistImages(artist: String):Array{
 		MISSING_ARTIST_SQUARE_IMG.push(`${artist} :: ${wip}`);
 	}
 	
-	let files = fs.readdirSync(ARTIST_WIDE_IMG_PATH).filter(fn => fn.startsWith(wip));
+	files = fs.readdirSync(ARTIST_WIDE_IMG_PATH).filter(fn => fn.startsWith(wip));
 	if(files.length > 0){
 		result.wide_image = ARTIST_WIDE_IMG_PATH +files.shift();
 		const dimensions = sizeOf(result.wide_image);
