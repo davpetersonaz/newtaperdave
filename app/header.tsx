@@ -2,40 +2,29 @@
 import Link from 'next/link';
 import { FaTwitter, FaGithub } from 'react-icons/fa';
 //import { FaTwitter, FaGithub, FaLinkedin } from 'react-icons/fa';
+import MyDropdown from '@/app/ui/dropdown';
 
 // Define the Header component
 export default function Header(){
 	return (
 		<header className="bg-gray-900 text-white py-4 sticky top-0 z-50">
-			{/* Header container */}
 			<div className="container mx-auto px-4 flex justify-between items-center">
-				{/* Website title */}
-				<h1 className="text-xl font-semibold">Taper Dave</h1>
-				{/* Navigation menu */}
+				<div className="flex flex-row gap-x-6">
+					<h1 className="text-xl font-semibold">Taper Dave</h1>
+					<MyDropdown />
+				</div>
 				<nav className="hidden md:block">
 					<ul className="flex gap-x-6">
-						{/* Navigation links */}
-						<li>
-							<Link href="/" className="hover:text-gray-300">
-								Home
-							</Link>
-						</li>
-						<li>
-							<Link href="/showlist" className="hover:text-gray-300">
-								About
-							</Link>
-						</li>
-						<li>
-							<Link href="/contact" className="hover:text-gray-300">
-								Contact
-							</Link>
-						</li>
+						<li><Link href="/" className="hover:text-gray-300">Home</Link></li>
+						<li><Link href="/showlist" className="hover:text-gray-300">About</Link></li>
+						<li><Link href="/contact" className="hover:text-gray-300">Contact</Link></li>
 					</ul>
 				</nav>
-				{/* Social media icons */}
+				{/* Social media icons 
 				<div className="hidden md:block">
 					<SocialIcons />
 				</div>
+				*/}
 				{/* Add Mobile Navigation Toggle Here */}
 			</div>
 		</header>

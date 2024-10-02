@@ -2,7 +2,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from "next/image";
-import { getShowListAlpha } from '@/app/lib/database';
+import { getShowListChrono } from '@/app/lib/database';
 import dateformat from "dateformat";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // FontAwesomeIcon component
 import { faFileArrowDown, faFileZipper, faPlay } from "@fortawesome/free-solid-svg-icons"; // individual icons necessary
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 }
 
 export default async function Page(){
-	const showlist = await getShowListAlpha();
+	const showlist = await getShowListChrono();
 	console.warn('showlist', showlist.length);
 	const output = [];
 	output.push(
@@ -20,29 +20,25 @@ export default async function Page(){
 			<p className='text-4xl font-bold pb-8'>Shows I Have Taped</p>
 		</div>
 	);
-	let currentArtist = 'unset';
-	let artist = []; let shows = [];
-		
+	let currentYear = 'unset';
+	let shows = [];
 	showlist.map(async (show) => {
-		//write the previous artist and their shows
-		if(show.artist !== currentArtist){
-			console.warn('new artist', show.artist);
-//			console.warn('artist', artist);//<<<< TODO: unsure why artist.length is 0 every time? 
+		const show_year = show.showdate.substring(0, 4);
+		//write the previous year and the shows
+		if(show_year !== currentYear){
+			console.warn('new year', show_year);
 			console.warn('shows.length', shows.length);
 			if(shows.length){//dont do this on the first pass thru the showlist
 				console.warn('push more output');
 				output.push(
 					<div>
 						<div className='pb-4'>
-							{artist.logo === '' ?
-								( <p className='text-3xl font-bold'>{artist.name}</p> ) :
-									( <Image src={artist.logo} alt={artist.name} height={artist.logo_h} width={artist.logo_w} className='mx-auto border-2 border-black'/> )
-							}
+							<p className='text-3xl font-bold'>{currentYear}</p>
 						</div>
 						<ul className='pb-8'>
 							{shows.map((line) => (
 								<li key={line.show_id}>
-									<Link href={'/showinfo/'+line.artist+'/'+line.showdate+'/'+line.source_num}>{line.showdate} - {line.venue} - {line.sourcetext}</Link> {line.pcloudlink} {line.archivelink} {line.samplefile}
+									<Link href={'/showinfo/'+line.artist+'/'+line.showdate+'/'+line.source_num}><span className='text-1xl font-bold'>{line.artist}</span> - {line.showdate} - {line.venue} - {line.sourcetext}</Link> {line.pcloudlink} {line.archivelink} {line.samplefile}
 								</li>
 							))}
 						</ul>
@@ -51,22 +47,16 @@ export default async function Page(){
 			}else{
 				console.warn('skipped object push');
 			}
-			//and new artist
-			currentArtist = show.artist;
+			//and new year
+			currentYear = show_year;
 			shows = [];
 			console.warn('reset shows', shows.length);
-			artist = [];
-			artist.name = show.artist;
-			artist.logo = show.artist_wide;
-			artist.logo_h = show.artist_wide_h;
-			artist.logo_w = show.artist_wide_w;
-			console.warn('reset artist filled', artist);
-			//now start the new artist's shows
+			//now start the next year's shows
 		}
 		console.warn('add show', show);
 		const line = [];
-		line.artist = show.artist;
 		line.show_id = show.show_id;
+		line.artist = show.artist;
 		line.showdate = show.showdate;
 		line.venue = show.venue;
 		line.source_num = show.sources;

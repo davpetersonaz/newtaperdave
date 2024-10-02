@@ -1,5 +1,4 @@
 
-import conn from '@/lib/db';
 import fs from 'fs';
 import { existsSync } from 'fs';
 import fsp from 'fs/promises';
@@ -7,6 +6,7 @@ import path from 'path';
 import { NextResponse } from 'next/server';
 import { removeAllShows, addShow } from './database';
 import sizeOf from 'image-size';
+import { strip } from '@/app/lib/util';
 
 export async function GET(request: Request): Response{
 //	console.warn('readShowFiles');
@@ -84,7 +84,7 @@ async function getFilenames(){
 	return filenames;
 }
 
-async function readFile(filename: String):String{
+async function readFile(filename: string):string{
 	const fileContents = await fsp.readFile(PATH + filename);
 	const fcs = fileContents.toString();
 //	console.warn('fileContents', fcs);
@@ -93,7 +93,7 @@ async function readFile(filename: String):String{
 	return result;
 }
 
-function getSource(fileContents: Array, filename: String):String{
+function getSource(fileContents: Array, filename: string):string{
 	const sourceLine = fileContents.filter(line => line.includes("source: "))[0];
 	let source = OTHER;
 	if(sourceLine){
@@ -133,7 +133,7 @@ function getSource(fileContents: Array, filename: String):String{
 	return source;
 }
 
-function getArtistSort(line: String):String{
+function getArtistSort(line: string):string{
 	let result = line;
 	if(line.substring(0, 4).toLowerCase() === 'the '){
 		result = line.substring(4) + ', The';
@@ -147,15 +147,18 @@ function getArtistSort(line: String):String{
 	return result;
 }
 
-function getArtistImages(artist: String):Array{
+function getArtistImages(artist: string):Array{
+	console.warn('getArtistImages', artist);
 	let result = [];
 	result.square_image = '', result.square_height = 0,  result.square_width = 0;
 	result.wide_image = '', result.wide_height = 0, result.wide_width = 0;
 	let wip = artist;
 	if(wip.substring(0, 4) === 'The '){ wip = wip.substring(4) + 'The'; }
-	wip = wip.replace(/[\W_]+/g, '') + 'Logo';
+	wip = strip(wip) + 'Logo';
+	console.warn('artist-logo wip', wip);
 
 	let files = fs.readdirSync(ARTIST_SQUARE_IMG_PATH).filter(fn => fn.startsWith(wip));
+	console.warn('ARTIST_SQUARE_IMG_PATH', ARTIST_SQUARE_IMG_PATH, files);
 	if(files.length > 0){
 		result.square_image = ARTIST_SQUARE_IMG_PATH + files.shift();
 		const dimensions = sizeOf(result.square_image);
@@ -167,6 +170,7 @@ function getArtistImages(artist: String):Array{
 	}
 	
 	files = fs.readdirSync(ARTIST_WIDE_IMG_PATH).filter(fn => fn.startsWith(wip));
+	console.warn('ARTIST_WIDE_IMG_PATH', ARTIST_WIDE_IMG_PATH, files);
 	if(files.length > 0){
 		result.wide_image = ARTIST_WIDE_IMG_PATH +files.shift();
 		const dimensions = sizeOf(result.wide_image);
@@ -177,11 +181,11 @@ function getArtistImages(artist: String):Array{
 		MISSING_ARTIST_WIDE_IMG.push(`${artist} :: ${wip}`);
 	}
 
-	console.warn('returning result', result);
+	console.warn('getArtistImages', result);
 	return result;	
 }
 
-function getShowDate(line: String):Array{
+function getShowDate(line: string):Array{
 	let result = [];
 	const found = line.match(/^.*(\d\d)\-(\d\d)\-(\d\d)(.*)$/);
 	result.showdate = '20' + found[3] + "-" + found[1] + "-" + found[2];
@@ -189,13 +193,14 @@ function getShowDate(line: String):Array{
 	return result;
 }
 
-function getVenue(line: String, logger: String):String{
+function getVenue(line: string, logger: string):string{
 	let result = [];
 	result.name = line;
 	result.image = '', result.height = 0, result.width = 0;
 	if(line.substring(0, 4) === 'The '){ line = line.substring(4) + 'The'; }
-	const stripped = line.replace(/[\W_]+/g, '') + 'Logo';
+	const stripped = strip(line) + 'Logo';
 	const files = fs.readdirSync(VENUE_IMG_PATH).filter(fn => fn.startsWith(stripped));
+	console.warn('VENUE_IMG_PATH', VENUE_IMG_PATH, files);
 	if(files.length > 0){
 		result.image = VENUE_IMG_PATH + files.shift();
 		const dimensions = sizeOf(result.image);
@@ -208,7 +213,7 @@ function getVenue(line: String, logger: String):String{
 	return result;	
 }
 
-function getCity(line: String):Array{
+function getCity(line: string):Array{
 	let result = [];
 	const commaPos = line.indexOf(', ');
 	result.city = (commaPos ? line.substring(0, commaPos) : line);
@@ -216,7 +221,7 @@ function getCity(line: String):Array{
 	return result;
 }
 
-function getLinks(fileContents: Array, logger: String):Array{
+function getLinks(fileContents: Array, logger: string):Array{
 	let result = { 'pcloud': '', 'archive': '' };
 	let possibleLink = fileContents.shift().trim();
 	while(possibleLink){
@@ -248,10 +253,10 @@ function getTheRest(fileContents: Array):Array{
 	return result;
 }
 
-function getSampleFile(artist: String, showdate: String, showdateplus: String):String{
+function getSampleFile(artist: string, showdate: string, showdateplus: string):string{
 	let result = '';
 	const artist_temp = (artist.substring(0, 4) === 'The ' ? artist.substring(4) + ', The' : artist);
-	const artist_stripped = artist_temp.replace(/[\W_]+/g, '').toLowerCase();
+	const artist_stripped = strip(artist_temp).toLowerCase();
 	const possibleSampleFile = artist_stripped + showdate + showdateplus + '.mp3';
 	console.warn('possibleSampleFile', possibleSampleFile);
 	if(existsSync(MP3_PATH + possibleSampleFile)){
@@ -263,7 +268,7 @@ function getSampleFile(artist: String, showdate: String, showdateplus: String):S
 	return result;
 }
 
-async function writeLogFile(filename: String, data: Array){
+async function writeLogFile(filename: string, data: Array){
 	let output = '';
 	data.sort();
 	data.forEach((line) => output = output + line + '\n');

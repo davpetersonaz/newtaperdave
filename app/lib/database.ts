@@ -2,13 +2,31 @@
 import conn from './db';
 
 export async function getShowListAlpha(){
-	const query = "SELECT show_id, artist, artist_wide, artist_wide_h, artist_wide_w, showdate, venue, sources, archivelink, pcloudlink, samplefile FROM shows ORDER BY artist_sort ASC, showdate ASC";
+	const query = "SELECT s.show_id, s.artist, s.artist_wide, s.artist_wide_h, s.artist_wide_w, s.showdate, s.venue, s.sources, s.archivelink, s.pcloudlink, s.samplefile, t.sourcetext FROM shows s LEFT JOIN sources t ON (t.id=s.sources) ORDER BY s.artist_sort ASC, s.showdate DESC";
 	const result = await conn.query(query);
 	return result.rows;
 }
 
 export async function getShowListChrono(){
-	const query = "SELECT show_id, artist, artist_wide, artist_wide_h, artist_wide_w, showdate, venue, sources, archivelink, pcloudlink, samplefile FROM shows ORDER BY showdate DESC";
+	const query = "SELECT s.show_id, s.artist, s.showdate, s.venue, s.sources, s.archivelink, s.pcloudlink, s.samplefile, t.sourcetext FROM shows s LEFT JOIN sources t ON (t.id=s.sources) ORDER BY s.showdate DESC";
+	const result = await conn.query(query);
+	return result.rows;
+}
+
+export async function getShowListCity(){
+	const query = "SELECT s.show_id, s.artist, s.showdate, s.venue, s.city, s.city_state, s.sources, s.archivelink, s.pcloudlink, s.samplefile, t.sourcetext FROM shows s LEFT JOIN sources t ON (t.id=s.sources) ORDER BY s.city ASC, s.showdate DESC";
+	const result = await conn.query(query);
+	return result.rows;
+}
+
+export async function getShowListSource(){
+	const query = "SELECT s.show_id, s.artist, s.showdate, s.venue, s.sources, s.archivelink, s.pcloudlink, s.samplefile, t.sourcetext FROM shows s LEFT JOIN sources t ON (t.id=s.sources) ORDER BY s.sources ASC, s.showdate DESC";
+	const result = await conn.query(query);
+	return result.rows;
+}
+
+export async function getShowListVenue(){
+	const query = "SELECT s.show_id, s.artist, s.showdate, s.venue, s.venue_logo, s.venue_logo_h, s.venue_logo_w, s.sources, s.archivelink, s.pcloudlink, s.samplefile, t.sourcetext FROM shows s LEFT JOIN sources t ON (t.id=s.sources) ORDER BY s.venue ASC, s.showdate DESC";
 	const result = await conn.query(query);
 	return result.rows;
 }

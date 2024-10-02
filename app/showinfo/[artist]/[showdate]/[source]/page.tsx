@@ -1,7 +1,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { getShow } from '../../../../lib/database';
+import { getShow } from '@/app/lib/database';
 
 export default async function Page({ params }: { params: { artist: string, showdate: string, source: string } }){
 	console.warn('showinfo', params.artist, params.showdate, params.source);
