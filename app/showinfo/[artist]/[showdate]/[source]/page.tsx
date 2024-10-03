@@ -22,7 +22,7 @@ export default async function Page({ params }: { params: { artist: string, showd
 					<div className='pt-8 border-3 border-black border-solid rounded'>
 						<p>20-second sample</p>
 						<audio controls className='w-300 h-54 m-0 mx-auto'>
-							<source src={showinfo.samplefile} type='audio/mpeg' className='' />
+							<source src={showinfo.samplefile.substring(8)} type='audio/mpeg' className='' />
 						</audio>
 					</div>
 				</>);

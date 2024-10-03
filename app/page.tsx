@@ -1,4 +1,3 @@
-
 /* npm run dev */
 
 import SplashImage from '@/app/ui/splash-image';
