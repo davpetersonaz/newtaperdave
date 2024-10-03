@@ -10,7 +10,7 @@ export default function Header(){
 		<header className="bg-gray-900 text-white py-4 sticky top-0 z-50">
 			<div className="container mx-auto px-4 flex justify-between items-center">
 				<div className="flex flex-row gap-x-6">
-					<h1 className="text-xl font-semibold">Taper Dave</h1>
+					<Link href="/" className="text-xl font-semibold">Taper Dave</Link>
 					<MyDropdown />
 				</div>
 				<nav className="hidden md:block">

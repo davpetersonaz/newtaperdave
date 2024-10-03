@@ -7,7 +7,7 @@ const MyDropdown = () => {
 	return (
 		<Dropdown>
 			<DropdownTrigger>
-				<Button variant="bordered" href="/showlist" className="text-xl font-semibold">ShowList</Button>
+				<Button variant="bordered" className="text-xl font-semibold">ShowList</Button>
 			</DropdownTrigger>
 			<DropdownMenu aria-label="ShowList" className="bg-black text-white">
 				<DropdownItem key="artist" href="/showlist" className="p-1 hover:bg-gray-500">Sort by Artist</DropdownItem>
