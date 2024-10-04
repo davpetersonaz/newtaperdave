@@ -1,14 +1,19 @@
 
 import Image from "next/legacy/image";
-import { fetchFrequentBands } from '@/app/lib/data';
+import { getFeaturedBands } from '@/app/lib/database';
 
 export default async function FrequentBands(){
-	const bands = await fetchFrequentBands();
-//	console.warn('bands', bands, typeof bands);
+	const bands = await getFeaturedBands();
+	const randoms = [];
+	for(let i=0; i<20 && i<bands.length; i++){
+		const randompos = Math.floor(Math.random() * bands.length);
+		const randomlogo = bands.splice(randompos, 1)[0];
+		randoms.push(randomlogo);
+	}
 	return (
 		<>
-			{bands.map(bandname=>{
-				return (<Logo name={bandname} key={bandname} />);
+			{randoms.map(logo=>{
+				return (<Logo name={logo} key={logo} />);
 			})}
 		</>
 	);
@@ -19,7 +24,7 @@ export function Logo({ name }: { name: string; }){
 //	const postfix = name.split('.').pop();
 	return (
 		<div className="relative h-40 w-64 gap-4 mt-4">
-			<Image src={"/images/artists/square/"+name} alt={name} layout="fill" objectFit="contain" />
+			<Image src={name} alt={name} layout="fill" objectFit="contain" />
 		</div>
 	);
 }

@@ -20,13 +20,19 @@ export async function getShowListCity(){
 }
 
 export async function getShowListSource(){
-	const query = "SELECT s.show_id, s.artist, s.showdate, s.venue, s.sources, s.archivelink, s.pcloudlink, s.samplefile, t.sourcetext FROM shows s LEFT JOIN sources t ON (t.id=s.sources) ORDER BY s.sources ASC, s.showdate DESC";
+	const query = `SELECT s.show_id, s.artist, s.showdate, s.venue, s.sources, s.archivelink, s.pcloudlink, s.samplefile, t.sourcetext 
+					FROM shows s 
+					LEFT JOIN sources t ON (t.id=s.sources) 
+					ORDER BY s.sources ASC, s.showdate DESC`;
 	const result = await conn.query(query);
 	return result.rows;
 }
 
 export async function getShowListVenue(){
-	const query = "SELECT s.show_id, s.artist, s.showdate, s.venue, s.venue_logo, s.venue_logo_h, s.venue_logo_w, s.sources, s.archivelink, s.pcloudlink, s.samplefile, t.sourcetext FROM shows s LEFT JOIN sources t ON (t.id=s.sources) ORDER BY s.venue ASC, s.showdate DESC";
+	const query = `SELECT s.show_id, s.artist, s.showdate, s.venue, s.venue_logo, s.venue_logo_h, s.venue_logo_w, s.sources, s.archivelink, s.pcloudlink, s.samplefile, t.sourcetext 
+					FROM shows s 
+					LEFT JOIN sources t ON (t.id=s.sources) 
+					ORDER BY s.venue ASC, s.showdate DESC`;
 	const result = await conn.query(query);
 	return result.rows;
 }
@@ -56,4 +62,18 @@ export async function getShow(artist:string, showdate:string, source:string){
 //	console.warn('getShow result.rows[0]', result.rows[0]);
 //	console.warn('getShow result.rows[0].json_agg', result.rows[0].json_agg);
 	return (result.rows.length > 0 ? result.rows[0].json_agg[0] : '');
+}
+
+export async function getFeaturedBands(){
+	const query = `SELECT artist_square, COUNT(artist) AS artist_count
+					FROM public.shows
+					WHERE artist_square <> ''
+					GROUP BY artist_square 
+					HAVING COUNT(artist_square) > 2
+					ORDER BY artist_count DESC`;
+	const result = await conn.query(query);
+	const namesOnly = [];
+	await result.rows.map(x => namesOnly.push(x['artist_square']));
+	console.warn('namesOnly', namesOnly, typeof namesOnly);
+	return namesOnly;
 }
