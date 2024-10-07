@@ -10,6 +10,7 @@ export default async function FrequentBands(){
 		const randomlogo = bands.splice(randompos, 1)[0];
 		randoms.push(randomlogo);
 	}
+//	console.warn('featured', randoms);
 	return (
 		<>
 			{randoms.map(logo=>{

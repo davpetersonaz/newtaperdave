@@ -1,3 +1,4 @@
+
 /* npm run dev */
 
 import SplashImage from '@/app/ui/splash-image';
@@ -7,6 +8,7 @@ import { Suspense } from 'react'
 import FrequentBandSkeleton from '@/app/ui/skeletons';
 
 export default function Page(){
+//	assertDatabaseConnection();
 	return (
 		<>
 			<SplashImage />
@@ -59,7 +61,7 @@ export default function Page(){
 			<div className="text-center mt-8">
 				<Link href="https://taperdave.com/showlist.php?s=y"><span className="text-xl">And On to The Music!</span></Link>
 				<p className="text-center">here are some of the bands {"I've"} taped the most</p>
-				<div className="flex flex-row flex-wrap justify-around">
+				<div className="flex flex-row flex-wrap justify-around pb-8">
 					<Suspense fallback={<FrequentBandSkeleton />}>
 						<FrequentBands />
 					</Suspense>
@@ -67,4 +69,14 @@ export default function Page(){
 			</div>
 		</>
 	);
+}
+
+async function assertDatabaseConnection(): Promise<void> {
+    try{
+	    await database.authenticate();
+	    await database.sync();
+	    console.info('Connection has been established successfully.');
+    }catch(error){
+		console.error('Unable to connect to the database:', error);
+    }
 }
