@@ -2,19 +2,28 @@
 import conn from './db';
 
 export async function getShowListAlpha(){
-	const query = "SELECT s.show_id, s.artist, s.artist_wide, s.artist_wide_h, s.artist_wide_w, s.showdate, s.venue, s.sources, s.archivelink, s.pcloudlink, s.samplefile, t.sourcetext FROM shows s LEFT JOIN sources t ON (t.id=s.sources) ORDER BY s.artist_sort ASC, s.showdate DESC";
+	const query = `SELECT s.show_id, s.artist, s.artist_wide, s.artist_wide_h, s.artist_wide_w, s.showdate, s.venue, s.sources, s.archivelink, s.pcloudlink, s.samplefile, t.sourcetext 
+					FROM shows s 
+					LEFT JOIN sources t ON (t.id=s.sources) 
+					ORDER BY s.artist_sort ASC, s.showdate DESC`;
 	const result = await conn.query(query);
 	return result.rows;
 }
 
 export async function getShowListChrono(){
-	const query = "SELECT s.show_id, s.artist, s.showdate, s.venue, s.sources, s.archivelink, s.pcloudlink, s.samplefile, t.sourcetext FROM shows s LEFT JOIN sources t ON (t.id=s.sources) ORDER BY s.showdate DESC";
+	const query = `SELECT s.show_id, s.artist, s.showdate, s.venue, s.sources, s.archivelink, s.pcloudlink, s.samplefile, t.sourcetext 
+					FROM shows s 
+					LEFT JOIN sources t ON (t.id=s.sources) 
+					ORDER BY s.showdate DESC`;
 	const result = await conn.query(query);
 	return result.rows;
 }
 
 export async function getShowListCity(){
-	const query = "SELECT s.show_id, s.artist, s.showdate, s.venue, s.city, s.city_state, s.sources, s.archivelink, s.pcloudlink, s.samplefile, t.sourcetext FROM shows s LEFT JOIN sources t ON (t.id=s.sources) ORDER BY s.city ASC, s.showdate DESC";
+	const query = `SELECT s.show_id, s.artist, s.showdate, s.venue, s.city, s.city_state, s.sources, s.archivelink, s.pcloudlink, s.samplefile, t.sourcetext 
+					FROM shows s 
+					LEFT JOIN sources t ON (t.id=s.sources) 
+					ORDER BY s.city_state ASC, s.showdate DESC`;
 	const result = await conn.query(query);
 	return result.rows;
 }
