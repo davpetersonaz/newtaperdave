@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from "next/image";
 import { getShowListAlpha } from '@/app/lib/database';
 import dateformat from "dateformat";
+import { strip, logoToArtistCamel } from "@/app/lib/util";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // FontAwesomeIcon component
 import { faFileArrowDown, faFileZipper, faPlay } from "@fortawesome/free-solid-svg-icons"; // individual icons necessary
 
@@ -32,7 +33,7 @@ export default async function Page(){
 			if(shows.length){//dont do this on the first pass thru the showlist
 				console.warn('push more output');
 				output.push(
-					<div>
+					<div id={artist.stripped}>
 						<div className='pb-4'>
 							{artist.logo === '' ?
 								( <p className='text-3xl font-bold'>{artist.name}</p> ) :
@@ -57,6 +58,7 @@ export default async function Page(){
 			console.warn('reset shows', shows.length);
 			artist = [];
 			artist.name = show.artist;
+			artist.stripped = logoToArtistCamel(show.artist_wide);
 			artist.logo = show.artist_wide;
 			artist.logo_h = show.artist_wide_h;
 			artist.logo_w = show.artist_wide_w;
