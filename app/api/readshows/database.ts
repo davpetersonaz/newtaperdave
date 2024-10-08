@@ -3,7 +3,8 @@ import conn from '../../lib/db';
 
 export async function addShow(showInfo:Array):Object{
 	const keys = (Object.keys(showInfo)).join(", ");
-	const query = `INSERT INTO shows (${keys}) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)`;
+	const query = `INSERT INTO shows (${keys}) 
+					VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)`;
 //	console.warn('query', query);
 	const values = (Object.values(showInfo));
 //	console.warn('values', values);
@@ -17,4 +18,15 @@ export async function removeAllShows():Object{
 	const result = await conn.query(query);
 //	console.warn('result', result);
 	return result;
+}
+
+export async function createCache(fetchXXX: Function){
+	const fetchArray = await fetchXXX();
+//	console.warn('fetchArray', fetchArray);
+	const query = `UPDATE query_cache
+					SET result = $2
+					WHERE query = $1`;
+	const values = [ fetchXXX.name, JSON.stringify(fetchArray) ];
+	const result = await conn.query(query, values);
+	console.warn(fetchXXX.name);
 }

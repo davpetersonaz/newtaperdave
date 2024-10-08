@@ -2,7 +2,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from "next/image";
-import { getShowListAlpha } from '@/app/lib/database';
+import { getShowListAlpha, getQueryCache } from '@/app/lib/database';
 import dateformat from "dateformat";
 import { strip, logoToArtistCamel } from "@/app/lib/util";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // FontAwesomeIcon component
@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 }
 
 export default async function Page(){
-	const showlist = await getShowListAlpha();
+	let showlist = await getQueryCache(getShowListAlpha.name);
+	showlist = (showlist === '' ? await getShowListAlpha() : JSON.parse(showlist));
 	console.warn('showlist', showlist.length);
 	const output = [];
 	output.push(

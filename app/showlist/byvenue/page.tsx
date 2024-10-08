@@ -2,7 +2,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from "next/image";
-import { getShowListVenue } from '@/app/lib/database';
+import { getShowListVenue, getQueryCache } from '@/app/lib/database';
+import { strip } from '@/app/lib/util';
 import dateformat from "dateformat";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // FontAwesomeIcon component
 import { faFileArrowDown, faFileZipper, faPlay } from "@fortawesome/free-solid-svg-icons"; // individual icons necessary
@@ -12,7 +13,8 @@ export const metadata: Metadata = {
 }
 
 export default async function Page(){
-	const showlist = await getShowListVenue();
+	let showlist = await getQueryCache(getShowListVenue.name);
+	showlist = (showlist === '' ? await getShowListVenue() : JSON.parse(showlist));
 	console.warn('showlist', showlist.length);
 	const output = [];
 	output.push(
@@ -32,7 +34,7 @@ export default async function Page(){
 			if(shows.length){//dont do this on the first pass thru the showlist
 				console.warn('push more output');
 				output.push(
-					<div>
+					<div id={strip(venue.name)}>
 						<div className='pb-4'>
 							{venue.logo === '' ? 
 								( <p className='text-3xl font-bold'>{venue.name}</p> ) :

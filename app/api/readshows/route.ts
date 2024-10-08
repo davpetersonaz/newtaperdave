@@ -4,7 +4,8 @@ import { existsSync } from 'fs';
 import fsp from 'fs/promises';
 import path from 'path';
 import { NextResponse } from 'next/server';
-import { removeAllShows, addShow } from './database';
+import { removeAllShows, addShow, createCache } from './database';
+import { getShowListAlpha, getShowListChrono, getShowListCity, getShowListSource, getShowListVenue } from '@/app/lib/database';
 import sizeOf from 'image-size';
 import { strip } from '@/app/lib/util';
 
@@ -68,6 +69,12 @@ export async function GET(request: Request): Response{
 		writeLogFile('missing_sample_files.txt', MISSING_SAMPLES);
 		writeLogFile('missing_venue_imgs.txt', MISSING_VENUE_IMG);
 		writeLogFile('unknown_sources.txt', UNKNOWN_SOURCE);
+		
+		createCache(getShowListAlpha);
+		createCache(getShowListChrono);
+		createCache(getShowListCity);
+		createCache(getShowListSource);
+		createCache(getShowListVenue);
 		
 		return NextResponse.json(`imported ${inc} shows into db`);
 	}catch(error){

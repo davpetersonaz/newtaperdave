@@ -2,7 +2,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from "next/image";
-import { getShowListCity } from '@/app/lib/database';
+import { strip } from '@/app/lib/util';
+import { getShowListCity, getQueryCache } from '@/app/lib/database';
 import dateformat from "dateformat";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // FontAwesomeIcon component
 import { faFileArrowDown, faFileZipper, faPlay } from "@fortawesome/free-solid-svg-icons"; // individual icons necessary
@@ -12,7 +13,8 @@ export const metadata: Metadata = {
 }
 
 export default async function Page(){
-	const showlist = await getShowListCity();
+	let showlist = await getQueryCache(getShowListCity.name);
+	showlist = (showlist === '' ? await getShowListCity() : JSON.parse(showlist));
 	console.warn('showlist', showlist.length);
 	const output = [];
 	output.push(
@@ -32,7 +34,7 @@ export default async function Page(){
 				//write the previous city and the shows
 				console.warn('push more output');
 				output.push(
-					<div>
+					<div id={strip(currentCity)}>
 						<div className='pb-4'>
 							<p className='text-3xl font-bold'>{currentCity}</p>
 						</div>

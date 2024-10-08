@@ -16,6 +16,7 @@ package-lock.json
 *.pem
 /.pnp
 .pnp.js
+/public/output/
 *.tsbuildinfo
 .vercel
 yarn-debug.log*

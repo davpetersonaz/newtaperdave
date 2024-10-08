@@ -86,3 +86,14 @@ export async function getFeaturedBands(){
 	console.warn('namesOnly', namesOnly, typeof namesOnly);
 	return namesOnly;
 }
+
+export async function getQueryCache(querystring: string){
+	const query = `SELECT result
+					FROM query_cache
+					WHERE query=$1`;
+	const values = [ querystring ];
+	const result = await conn.query(query, values);
+//	console.warn('result.rows', typeof result.rows, result.rows);
+//	console.warn('result.rows[0].result', typeof result.rows[0].result, result.rows[0].result);
+	return (result.rows[0].result ? result.rows[0].result : '');
+}
