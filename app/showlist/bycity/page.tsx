@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 export default async function Page(){
 	let showlist = await getQueryCache(getShowListCity.name);
+	console.warn('getShowListCity cache used', showlist !== '');
 	showlist = (showlist === '' ? await getShowListCity() : JSON.parse(showlist));
 	console.warn('showlist', showlist.length);
 	const output = [];
@@ -27,12 +28,12 @@ export default async function Page(){
 		
 	showlist.map(async (show) => {
 		if(show.city_state !== currentCity){
-			console.warn('new city', show.city_state);
-			console.warn('shows.length', shows.length);
+//			console.warn('new city', show.city_state);
+//			console.warn('shows.length', shows.length);
 			//dont do this on the first pass thru the showlist
 			if(shows.length){
 				//write the previous city and the shows
-				console.warn('push more output');
+//				console.warn('push more output');
 				output.push(
 					<div id={strip(currentCity)}>
 						<div className='pb-4'>
@@ -48,14 +49,14 @@ export default async function Page(){
 					</div>
 				);
 			}else{
-				console.warn('skipped object push');
+//				console.warn('skipped object push');
 			}
 			currentCity = show.city_state;
 			shows = [];
-			console.warn('reset city', currentCity);
+//			console.warn('reset city', currentCity);
 			//now start the new city's shows
 		}
-		console.warn('add show', show);
+//		console.warn('add show', show);
 		const line = [];
 		line.show_id = show.show_id;
 		line.artist = show.artist;
@@ -66,11 +67,11 @@ export default async function Page(){
 		line.sourcetext = show.sourcetext;
 		line.archivelink = (show.archivelink === '' ? <></> :	( <Link href={show.archivelink} target="_blank"> <FontAwesomeIcon icon={faFileZipper} /> </Link> ) );
 		line.pcloudlink =  (show.pcloudlink === '' ?  <></> :	( <Link href={show.pcloudlink} target="_blank">  <FontAwesomeIcon icon={faFileArrowDown} /> </Link> ) );
-		line.samplefile =  (show.samplefile === '' ?  <></> :	( <Link href={show.samplefile} target="_blank">  <FontAwesomeIcon icon={faPlay} /> </Link> ) );
+		line.samplefile =  (show.samplefile === '' ?  <></> :	( <Link href={'/showinfo/'+line.artist+'/'+line.showdate+'/'+line.source_num} target="_blank">  <FontAwesomeIcon icon={faPlay} /> </Link> ) );
 		shows.push(line);
-		console.warn('shows updated', shows.length, line);
+//		console.warn('shows updated', shows.length);
 	});
-	console.warn('output size', output.length);
+//	console.warn('output size', output.length);
 
 	return (
 		<>

@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 export default async function Page(){
 	let showlist = await getQueryCache(getShowListVenue.name);
+	console.warn('getShowListVenue cache used', showlist !== '');
 	showlist = (showlist === '' ? await getShowListVenue() : JSON.parse(showlist));
 	console.warn('showlist', showlist.length);
 	const output = [];
@@ -28,11 +29,11 @@ export default async function Page(){
 	showlist.map(async (show) => {
 		//write the previous venue and their shows
 		if(show.venue !== currentVenue){
-			console.warn('new venue', show.venue);
+//			console.warn('new venue', show.venue);
 //			console.warn('venue', venue);//<<<< TODO: unsure why venue.length is 0 every time? 
-			console.warn('shows.length', shows.length);
+//			console.warn('shows.length', shows.length);
 			if(shows.length){//dont do this on the first pass thru the showlist
-				console.warn('push more output');
+//				console.warn('push more output');
 				output.push(
 					<div id={strip(venue.name)}>
 						<div className='pb-4'>
@@ -51,21 +52,21 @@ export default async function Page(){
 					</div>
 				);
 			}else{
-				console.warn('skipped object push');
+//				console.warn('skipped object push');
 			}
 			//and new venue
 			currentVenue = show.venue;
 			shows = [];
-			console.warn('reset shows', shows.length);
+//			console.warn('reset shows', shows.length);
 			venue = [];
 			venue.name = show.venue;
 			venue.logo = show.venue_logo;
 			venue.logo_h = show.venue_logo_h;
 			venue.logo_w = show.venue_logo_w;
-			console.warn('reset venue filled', venue);
+//			console.warn('reset venue filled', venue);
 			//now start the new venue's shows
 		}
-		console.warn('add show', show);
+//		console.warn('add show', show);
 		const line = [];
 		line.show_id = show.show_id;
 		line.artist = show.artist;
@@ -75,12 +76,12 @@ export default async function Page(){
 		line.sourcetext = show.sourcetext;
 		line.archivelink = (show.archivelink === '' ? <></> :	( <Link href={show.archivelink} target="_blank"> <FontAwesomeIcon icon={faFileZipper} /> </Link> ) );
 		line.pcloudlink =  (show.pcloudlink === '' ? <></> :	( <Link href={show.pcloudlink} target="_blank">  <FontAwesomeIcon icon={faFileArrowDown} /> </Link> ) );
-		line.samplefile =  (show.samplefile === '' ? <></> :	( <Link href={show.samplefile} target="_blank">  <FontAwesomeIcon icon={faPlay} /> </Link> ) );
+		line.samplefile =  (show.samplefile === '' ? <></> :	( <Link href={'/showinfo/'+line.artist+'/'+line.showdate+'/'+line.source_num} target="_blank">  <FontAwesomeIcon icon={faPlay} /> </Link> ) );
 		shows.push(line);
-		console.warn('shows updated', shows.length, line);
+//		console.warn('shows updated', shows.length);
 	});
 
-	console.warn('output size', output.length);
+//	console.warn('output size', output.length);
 	return (
 		<>
 			<div className='text-center'>

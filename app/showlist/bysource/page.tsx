@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 export default async function Page(){
 	let showlist = await getQueryCache(getShowListSource.name);
+	console.warn('getShowListSource cache used', showlist !== '');
 	showlist = (showlist === '' ? await getShowListSource() : JSON.parse(showlist));
 	console.warn('showlist', showlist.length);
 	const output = [];
@@ -28,10 +29,10 @@ export default async function Page(){
 	showlist.map(async (show) => {
 		//write the previous source and shows
 		if(show.sourcetext !== currentSource){
-			console.warn('new source', show.sourcetext);
-			console.warn('shows.length', shows.length);
+//			console.warn('new source', show.sourcetext);
+//			console.warn('shows.length', shows.length);
 			if(shows.length){//dont do this on the first pass thru the showlist
-				console.warn('push more output');
+//				console.warn('push more output');
 				output.push(
 					<div id={strip(currentSource)}>
 						<div className='pb-4'>
@@ -47,15 +48,15 @@ export default async function Page(){
 					</div>
 				);
 			}else{
-				console.warn('skipped object push');
+//				console.warn('skipped object push');
 			}
 			//and new source
 			currentSource = show.sourcetext;
 			shows = [];
-			console.warn('reset shows', shows.length);
+//			console.warn('reset shows', shows.length);
 			//now start the new source's shows
 		}
-		console.warn('add show', show);
+//		console.warn('add show', show);
 		const line = [];
 		line.show_id = show.show_id;
 		line.artist = show.artist;
@@ -65,12 +66,12 @@ export default async function Page(){
 		line.sourcetext = show.sourcetext;
 		line.archivelink = (show.archivelink === '' ? <></> :	( <Link href={show.archivelink} target="_blank"> <FontAwesomeIcon icon={faFileZipper} /> </Link> ) );
 		line.pcloudlink =  (show.pcloudlink === '' ? <></> :	( <Link href={show.pcloudlink} target="_blank">  <FontAwesomeIcon icon={faFileArrowDown} /> </Link> ) );
-		line.samplefile =  (show.samplefile === '' ? <></> :	( <Link href={show.samplefile} target="_blank">  <FontAwesomeIcon icon={faPlay} /> </Link> ) );
+		line.samplefile =  (show.samplefile === '' ? <></> :	( <Link href={'/showinfo/'+line.artist+'/'+line.showdate+'/'+line.source_num} target="_blank">  <FontAwesomeIcon icon={faPlay} /> </Link> ) );
 		shows.push(line);
-		console.warn('shows updated', shows.length, line);
+//		console.warn('shows updated', shows.length);
 	});
 
-	console.warn('output size', output.length);
+//	console.warn('output size', output.length);
 	return (
 		<>
 			<div className='text-center'>
