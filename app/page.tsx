@@ -15,7 +15,7 @@ export default function Page(){
 			<div className="flex flex-col space-y-3 pt-6 mx-[20%]">
 				<p>
 					<span className="font-bold">A quick note about taping live bands...</span>{" "}
-					The bands I record are <span className="italic">"taper-friendly"</span>, they follow the tradition set forth by the Grateful Dead{" "}
+					The bands I record are <span className='italic'>&quot;taper-friendly&quot;</span>, they follow the tradition set forth by the Grateful Dead{" "}
 					that <span className="italic">live audience recordings</span> are beneficial to the promotion and success of a touring band,{" "}
 					especially those who throw a lot of improvisation into their sets{" "}
 					(and therefore appreciate having their accomplishments preserved so they can relisten to what they brought forth).
@@ -43,7 +43,7 @@ export default function Page(){
 				<p>
 					Keep in mind some recordings are better than others for a variety of reasons{" "}
 					(the microphones, the placement, the room, me, the soundguy, the amps, etc).{" "}
-					Generally, the older the recording, the higher the likelihood it might not be "that great",{" "}
+					Generally, the older the recording, the higher the likelihood it might not be &quot;that great&quot;,{" "}
 					I have provided samples of each show so you can take a quick listen before downloading.{" "}
 					For your reference, the progression of equipment I have used started with the ZoomH4n, then the ZoomH6 for a brief period, then the ZoomH5,{" "}
 					then I purchased some good external mics, first were Audio Technica 853 microphones, and most recently my new Golden Age Project FC4 condenser mics.

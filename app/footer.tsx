@@ -1,5 +1,6 @@
 
 //import { FaGithub, FaTwitter } from 'react-icons/fa';
+import Link from 'next/link';
 
 // Define the Footer component
 export default function Footer(){
@@ -8,14 +9,14 @@ export default function Footer(){
 			{/* First section of the footer */}
 			<div className="container mx-auto px-4 flex justify-between items-center">
 				{/* Display your name and the current year */}
-				<p className="mx-auto">Your Name &copy; {new Date().getFullYear()}</p>
+				<p className="mx-auto"><Link href='mailto:davpeterson@zoho.com' target='_blank'>Dave Peterson</Link> &copy; {new Date().getFullYear()}</p>
 			</div>
 			{/* Second section of the footer */}
 			<div className="container mx-auto px-4 flex justify-between items-center">
 				{/* Provide a link to your Twitter profile */}
-				<a href="https://twitter.com/your-username" className="mx-auto">
+				<Link href="https://twitter.com/davpeterson27" target='_blank' className="mx-auto">
 					Connect on Twitter
-				</a>
+				</Link>
 			</div>
 		</footer>
 	);

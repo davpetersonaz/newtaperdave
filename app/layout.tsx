@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 };
 	
 export default function RootLayout({
-	children //this will be a page or a nested layout
-}: Readonly<{ children: React.ReactNode; }>
+		children //this will be a page or a nested layout
+	}: Readonly<{ children: React.ReactNode; }>
 ) {
 	return (
 		<html lang="en">
@@ -31,6 +31,4 @@ export default function RootLayout({
 			</body>
 		</html>
 	);
-	
-	//TODO: footer isn't staying on the bottom
 }

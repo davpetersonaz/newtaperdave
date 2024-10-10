@@ -1,7 +1,6 @@
 
 import Link from 'next/link';
 import { FaTwitter, FaGithub } from 'react-icons/fa';
-//import { FaTwitter, FaGithub, FaLinkedin } from 'react-icons/fa';
 import MyDropdown from '@/app/ui/dropdown';
 
 // Define the Header component
@@ -10,9 +9,10 @@ export default function Header(){
 		<header className="bg-gray-900 text-white py-4 sticky top-0 z-50">
 			<div className="container mx-auto px-4 flex justify-between items-center">
 				<div className="flex flex-row gap-x-6">
-					<Link href="/" className="text-xl font-semibold">Taper Dave</Link>
+					<Link href="/" className="p-1.5 text-xl font-semibold">Taper Dave</Link>
 					<MyDropdown />
 				</div>
+				{/* Navigation buttons
 				<nav className="hidden md:block">
 					<ul className="flex gap-x-6">
 						<li><Link href="/" className="hover:text-gray-300">Home</Link></li>
@@ -20,6 +20,7 @@ export default function Header(){
 						<li><Link href="/contact" className="hover:text-gray-300">Contact</Link></li>
 					</ul>
 				</nav>
+				*/}
 				{/* Social media icons 
 				<div className="hidden md:block">
 					<SocialIcons />

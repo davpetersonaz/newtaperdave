@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getShow } from '@/app/lib/database';
 
-export default async function Page({ params }: { params: { artist: string, showdate: string, source: string } }){
+export default async function Page({ params }: { params: { artist:string, showdate:string, source:string } }){
 	console.warn('showinfo', params.artist, params.showdate, params.source);
 	const showinfo = await getShow(decodeURIComponent(params.artist), params.showdate, params.source);
 	console.warn('showinfo', showinfo);
@@ -19,7 +19,7 @@ export default async function Page({ params }: { params: { artist: string, showd
 	const sample = (showinfo.samplefile === ''
 			?	<></>
 			:	<>
-					<div className='pt-8 border-3 border-black border-solid rounded'>
+					<div className='mt-8 pt-3 border-2 border-black border-solid rounded'>
 						<p>20-second sample</p>
 						<audio controls className='w-300 h-54 m-0 mx-auto'>
 							<source src={showinfo.samplefile.substring(8)} type='audio/mpeg' className='' />
@@ -28,7 +28,7 @@ export default async function Page({ params }: { params: { artist: string, showd
 				</>);
 	const setlist = JSON.parse(showinfo.setlist);
 	let i = 1;//the key is not going to change, and we have nothing else to use to uniquely identify the line.
-	const setlist_str = setlist.map(line => line === '' ? ( <br /> ) : ( <li key={i++}>{line === '' ? '  ' : line}</li> ) );
+	const setlist_str = setlist.map(line => line === '' ? ( <br key={i++}/> ) : ( <li key={i++}>{line === '' ? '  ' : line}</li> ) );
 	return (
 		<div className='text-center'> 
 			<div className='grid grid-cols-2 gap-16'>

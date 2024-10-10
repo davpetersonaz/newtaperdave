@@ -2,7 +2,7 @@
 import { Pool } from "pg";
 import 'dotenv/config';
 
-let conn;
+let conn: Pool;
 if(!conn){
 	conn = new Pool({
 		user: process.env.PGSQL_USER,
