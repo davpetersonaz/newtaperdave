@@ -5,34 +5,40 @@ import fsp from 'fs/promises';
 import path from 'path';
 import { NextResponse } from 'next/server';
 import { removeAllShows, addShow, createCache } from './database';
-import { getShowListAlpha, getShowListChrono, getShowListCity, getShowListSource, getShowListVenue } from '@/app/lib/database';
+import { GAP, AT853, MATRIX_WITH_GAP, MATRIX_WITH_AT853, MATRIX_WITH_H5, MATRIX_WITH_H6, MATRIX_WITH_H4, SBD, MBHO, OTHER, ZOOMH5, ZOOMH6, ZOOMH4 } from './database';
+import { getShowListAlpha, getShowListChrono, getShowListCity, getShowListSource, getShowListVenue } from '../../lib/database';
 import sizeOf from 'image-size';
-import { strip } from '@/app/lib/util';
+import { strip } from '@/lib/util';
+import { ShowInfo } from '@/types/ShowInfoType';
 
-type ShowInfo = {
-	sources?: string,
-	artist?: string,
-	artist_sort?: string,
-	artist_wide?: string,
-	artist_wide_h?: number,
-	artist_wide_w?: number,
-	artist_square?: string,
-	artist_square_h?: number,
-	artist_square_w?: number,
-	showdate?: string,
-	venue?: string,
-	venue_logo?: string,
-	venue_logo_h?: number,
-	venue_logo_w?: number,
-	city?: string,
-	city_state?: string,
-	pcloudlink?: string,
-	archivelink?: string,
-	setlist?: string,
-	samplefile?: string
-};
+interface Venue {
+	name: string;
+	image: string;
+	height: number;
+	width: number;
+}
+interface ArtistImages {
+	square_image: string;
+	square_height: number;
+	square_width: number;
+	wide_image: string;
+	wide_height: number;
+	wide_width: number;
+}
+interface ShowDate {
+	showdate: string;
+	showdateplus: string;
+}
+interface City {
+	city: string;
+	city_state: string;
+}
+interface Links {
+	pcloud: string;
+	archive: string;
+}
 
-export async function GET(request:Request){
+export async function GET(request: Request){
 //	console.warn('readShowFiles');
 	try{
 		//reset these
@@ -46,58 +52,94 @@ export async function GET(request:Request){
 
 		const filenames = await getFilenames();
 //		console.warn('filenames', filenames);
-		
-		removeAllShows();
+		await removeAllShows();
 		
 		let inc = 0;
 		for(const filename of filenames){
 			console.warn('importing', filename);
-			const fileContents:Array<string> = await readFile(filename);
-			const showInfo:ShowInfo = {};
-			showInfo.sources = getSource(fileContents, filename);
-			showInfo.artist = fileContents.shift().trim();
+			const fileContents: string[] = await readFile(filename);
+			// Skip empty or invalid files
+			if (!fileContents.length) {
+				console.warn(`Skipping empty file: ${filename}`);
+				continue;
+			}
+			const showInfo: ShowInfo = {};
+			
+			// Safely extract artist
+			const artistLine = fileContents.shift();
+			if (!artistLine) {
+				console.warn(`Missing artist in file: ${filename}`);
+				continue;
+			}
+			showInfo.artist = artistLine.trim();
 			showInfo.artist_sort = getArtistSort(showInfo.artist);
-			const artist_images = getArtistImages(showInfo.artist);
+			// Extract other fields with safety checks
+			showInfo.sources = getSource(fileContents, filename);
+			const artist_images = getArtistImages(showInfo.artist!);
 			showInfo.artist_wide = artist_images.wide_image;
 			showInfo.artist_wide_h = artist_images.wide_height;
 			showInfo.artist_wide_w = artist_images.wide_width;
 			showInfo.artist_square = artist_images.square_image;
 			showInfo.artist_square_h = artist_images.square_height;
 			showInfo.artist_square_w = artist_images.square_width;
-			const { showdate, showdateplus } = getShowDate(fileContents.shift().trim());
+			const dateLine = fileContents.shift();
+			if (!dateLine) {
+				console.warn(`Missing show date in file: ${filename}`);
+				continue;
+			}
+			const { showdate, showdateplus } = getShowDate(dateLine.trim());
 			showInfo.showdate = showdate;
-			const logger:string = showInfo.artist + ' :: ' + showInfo.showdate;
-			const venue:Array<string|number> = getVenue(fileContents.shift().trim(), logger);
+			
+			const logger: string = `${showInfo.artist} :: ${showInfo.showdate}`;
+			const venueLine = fileContents.shift();
+			if (!venueLine) {
+				console.warn(`Missing venue in file: ${filename}`);
+				continue;
+			}
+			const venue: Venue = getVenue(venueLine.trim(), logger);
 			showInfo.venue = venue.name;
 			showInfo.venue_logo = venue.image;
 			showInfo.venue_logo_h = venue.height;
 			showInfo.venue_logo_w = venue.width;
-			const { city, city_state } = getCity(fileContents.shift().trim());
+			const cityLine = fileContents.shift();
+			if (!cityLine) {
+			  console.warn(`Missing city in file: ${filename}`);
+			  continue;
+			}
+			const { city, city_state } = getCity(cityLine.trim());
 			showInfo.city = city;
 			showInfo.city_state = city_state;
 			const { pcloud, archive } = getLinks(fileContents, logger);
 			showInfo.pcloudlink = pcloud;
 			showInfo.archivelink = archive;
 			showInfo.setlist = JSON.stringify(getTheRest(fileContents));
-			showInfo.samplefile = getSampleFile(showInfo.artist, showInfo.showdate, showdateplus);
+			showInfo.samplefile = getSampleFile(showInfo.artist!, showInfo.showdate!, showdateplus);
 			console.warn('showInfo', showInfo);
-			const result = addShow(showInfo);
+			// Validate required fields
+			if (!showInfo.artist || !showInfo.showdate || !showInfo.venue || !showInfo.city) {
+				console.warn(`Skipping incomplete showInfo for file: ${filename}`);
+				continue;
+			}
+			await addShow(showInfo);
 			inc++;
 		}
 		
-		writeLogFile('missing_archive_links.txt', MISSING_ARCHIVE);
-		writeLogFile('missing_artist_wide_imgs.txt', MISSING_ARTIST_WIDE_IMG);
-		writeLogFile('missing_artist_square_imgs.txt', MISSING_ARTIST_SQUARE_IMG);
-		writeLogFile('missing_pcloud_links.txt', MISSING_PCLOUD);
-		writeLogFile('missing_sample_files.txt', MISSING_SAMPLES);
-		writeLogFile('missing_venue_imgs.txt', MISSING_VENUE_IMG);
-		writeLogFile('unknown_sources.txt', UNKNOWN_SOURCE);
+		await writeLogFile('missing_archive_links.txt', MISSING_ARCHIVE);
+		await writeLogFile('missing_artist_wide_imgs.txt', MISSING_ARTIST_WIDE_IMG);
+		await writeLogFile('missing_artist_square_imgs.txt', MISSING_ARTIST_SQUARE_IMG);
+		await writeLogFile('missing_pcloud_links.txt', MISSING_PCLOUD);
+		await writeLogFile('missing_sample_files.txt', MISSING_SAMPLES);
+		await writeLogFile('missing_venue_imgs.txt', MISSING_VENUE_IMG);
+		await writeLogFile('unknown_sources.txt', UNKNOWN_SOURCE);
 		
-		createCache(getShowListAlpha);
-		createCache(getShowListChrono);
-		createCache(getShowListCity);
-		createCache(getShowListSource);
-		createCache(getShowListVenue);
+		// Create caches
+		await Promise.all([
+			createCache(getShowListAlpha),
+			createCache(getShowListChrono),
+			createCache(getShowListCity),
+			createCache(getShowListSource),
+			createCache(getShowListVenue),
+		]);
 		
 		return NextResponse.json(`imported ${inc} shows into db`);
 	}catch(error){
@@ -106,25 +148,29 @@ export async function GET(request:Request){
 	}
 }
 
-async function getFilenames():Array{
+async function getFilenames(): Promise<string[]> {
 	const dir = path.resolve(PATH);
 //	console.warn('dir', dir);
-	const filenames = await fs.readdirSync(dir);
+	const filenames = fs.readdirSync(dir);
 //	console.warn('filenames', filenames);
 	return filenames;
 }
 
-async function readFile(filename:string):Array{
+async function readFile(filename:string): Promise<string[]> {
 	const fileContents = await fsp.readFile(PATH + filename);
 	const fcs = fileContents.toString();
-//	console.warn('fileContents', fcs);
+
+	//the following line filters out empty lines after splitting...
+//	const result = fcs.split('\n').filter((line) => line.trim() !== '');
+	//or, as i initially intended...
 	const result = fcs.split("\n");
+
 //	console.warn('result', result);
 	return result;
 }
 
-function getSource(fileContents:Array, filename:string):string{
-	const sourceLine = fileContents.filter(line => line.includes("source: "))[0];
+function getSource(fileContents: string[], filename: string): number {
+	const sourceLine = fileContents.filter((line) => line.includes("source: "))[0];
 	let source = OTHER;
 	if(sourceLine){
 		const sourceLower = sourceLine.toLowerCase();
@@ -163,7 +209,7 @@ function getSource(fileContents:Array, filename:string):string{
 	return source;
 }
 
-function getArtistSort(line:string):string{
+function getArtistSort(line: string): string{
 	let result = line;
 	if(line.substring(0, 4).toLowerCase() === 'the '){
 		result = line.substring(4) + ', The';
@@ -177,35 +223,40 @@ function getArtistSort(line:string):string{
 	return result;
 }
 
-function getArtistImages(artist:string):Array{
+function getArtistImages(artist: string): ArtistImages{
 	console.warn('getArtistImages', artist);
-	const result:Array<string|number> = [];
-	result.square_image = '', result.square_height = 0,  result.square_width = 0;
-	result.wide_image = '', result.wide_height = 0, result.wide_width = 0;
-	let wip:string = artist;
+	const result: ArtistImages = {
+		square_image: '',
+		square_height: 0,
+		square_width: 0,
+		wide_image: '',
+		wide_height: 0,
+		wide_width: 0,
+	};
+	let wip: string = artist;
 	if(wip.substring(0, 4) === 'The '){ wip = wip.substring(4) + 'The'; }
 	wip = strip(wip) + 'Logo';
 	console.warn('artist-logo wip', wip);
 
-	let files:Array<string> = fs.readdirSync(ARTIST_SQUARE_IMG_PATH).filter(fn => fn.startsWith(wip));
+	let files: string[] = fs.readdirSync(ARTIST_SQUARE_IMG_PATH).filter((fn) => fn.startsWith(wip));
 	console.warn('ARTIST_SQUARE_IMG_PATH', ARTIST_SQUARE_IMG_PATH, files);
 	if(files.length > 0){
 		result.square_image = ARTIST_SQUARE_IMG_PATH + files.shift();
 		const dimensions = sizeOf(result.square_image);
-		result.square_height = dimensions.height;
-		result.square_width = dimensions.width;
+		result.square_height = dimensions.height!;
+		result.square_width = dimensions.width!;
 		result.square_image = result.square_image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
 	}else{
 		MISSING_ARTIST_SQUARE_IMG.push(`${artist} :: ${wip}`);
 	}
 	
-	files = fs.readdirSync(ARTIST_WIDE_IMG_PATH).filter(fn => fn.startsWith(wip));
+	files = fs.readdirSync(ARTIST_WIDE_IMG_PATH).filter((fn) => fn.startsWith(wip));
 	console.warn('ARTIST_WIDE_IMG_PATH', ARTIST_WIDE_IMG_PATH, files);
 	if(files.length > 0){
 		result.wide_image = ARTIST_WIDE_IMG_PATH +files.shift();
 		const dimensions = sizeOf(result.wide_image);
-		result.wide_height = dimensions.height;
-		result.wide_width = dimensions.width;
+		result.wide_height = dimensions.height!;
+		result.wide_width = dimensions.width!;
 		result.wide_image = result.wide_image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
 	}else{
 		MISSING_ARTIST_WIDE_IMG.push(`${artist} :: ${wip}`);
@@ -215,27 +266,30 @@ function getArtistImages(artist:string):Array{
 	return result;	
 }
 
-function getShowDate(line:string):Array{
-	const result = [];
+function getShowDate(line:string): ShowDate {
+	const result:ShowDate = { showdate: '', showdateplus: '' };
 	const found = line.match(/^.*(\d\d)\-(\d\d)\-(\d\d)(.*)$/);
-	result.showdate = '20' + found[3] + "-" + found[1] + "-" + found[2];
-	result.showdateplus = (found[4] ? found[4] : '');//only used to find the mp3 sample, at this point, not saved to db
+	if (found) {
+		result.showdate = '20' + found[3] + "-" + found[1] + "-" + found[2];
+		result.showdateplus = (found[4] ? found[4] : '');//only used to find the mp3 sample, at this point, not saved to db
+	}
 	return result;
 }
 
-function getVenue(line:string, logger:string):Array{
-	const result = [];
-	result.name = line;
-	result.image = '', result.height = 0, result.width = 0;
-	if(line.substring(0, 4) === 'The '){ line = line.substring(4) + 'The'; }
-	const stripped = strip(line) + 'Logo';
-	const files = fs.readdirSync(VENUE_IMG_PATH).filter(fn => fn.startsWith(stripped));
+function getVenue(line:string, logger:string): Venue{
+	const result: Venue = { name: line, image: '', height: 0, width: 0 };
+	let venueName = line;
+	if(venueName.substring(0, 4) === 'The '){
+		venueName = venueName.substring(4) + 'The';
+	}
+	const stripped = strip(venueName) + 'Logo';
+	const files = fs.readdirSync(VENUE_IMG_PATH).filter((fn) => fn.startsWith(stripped));
 	console.warn('VENUE_IMG_PATH', VENUE_IMG_PATH, files);
 	if(files.length > 0){
 		result.image = VENUE_IMG_PATH + files.shift();
 		const dimensions = sizeOf(result.image);
-		result.height = dimensions.height;
-		result.width = dimensions.width;
+		result.height = dimensions.height!;
+		result.width = dimensions.width!;
 		result.image = result.image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
 	}else{
 		MISSING_VENUE_IMG.push(`${stripped} :: ${logger}`);
@@ -243,17 +297,17 @@ function getVenue(line:string, logger:string):Array{
 	return result;	
 }
 
-function getCity(line:string):Array{
-	const result = [];
+function getCity(line:string): City {
+	const result:City = { city: '', city_state: '' };
 	const commaPos = line.indexOf(', ');
 	result.city = (commaPos ? line.substring(0, commaPos) : line);
 	result.city_state = line;
 	return result;
 }
 
-function getLinks(fileContents:Array, logger:string):Array{
-	const result = { 'pcloud': '', 'archive': '' };
-	let possibleLink = fileContents.shift().trim();
+function getLinks(fileContents:string[], logger:string): Links {
+	const result:Links = { 'pcloud': '', 'archive': '' };
+	let possibleLink = fileContents.shift()?.trim();
 	while(possibleLink){
 //		console.warn('possibleLink', possibleLink);
 		if(possibleLink.includes('my.pcloud.com') || possibleLink.includes('u.pcloud.link')){
@@ -262,7 +316,7 @@ function getLinks(fileContents:Array, logger:string):Array{
 		if(possibleLink.includes('archive.org')){
 			result.archive = possibleLink;
 		}
-		possibleLink = fileContents.shift().trim();
+		possibleLink = fileContents.shift()?.trim();
 	}
 	if(!result.pcloud){ 
 		console.warn('MISSING: pcloud link', logger); 
@@ -275,10 +329,11 @@ function getLinks(fileContents:Array, logger:string):Array{
 	return result;
 }
 
-function getTheRest(fileContents:Array):Array{
-	const result = [];
+function getTheRest(fileContents:string[]): string[] {
+	const result: string[] = [];
 	while(fileContents.length > 0){
-		result.push(fileContents.shift().trim());
+		const line = fileContents.shift()?.trim();
+		if (line) result.push(line);
 	}
 	return result;
 }
@@ -298,10 +353,10 @@ function getSampleFile(artist:string, showdate:string, showdateplus:string):stri
 	return result;
 }
 
-async function writeLogFile(filename:string, data:Array):void{
+async function writeLogFile(filename:string, data:string[]): Promise<void> {
 	let output = '';
 	data.sort();
-	data.forEach((line) => output = output + line + '\n');
+	data.forEach((line) => (output = output + line + '\n'));
 	await fs.writeFileSync(OUTPUT_PATH + filename, output);
 	console.warn('wrote log file', filename);
 }
@@ -314,26 +369,10 @@ const PATH = './public/files/';
 const VENUE_IMG_PATH = './public/images/venues/';
 	
 //logging files
-let MISSING_ARCHIVE = [];
-let MISSING_ARTIST_SQUARE_IMG = [];
-let MISSING_ARTIST_WIDE_IMG = [];
-let MISSING_PCLOUD = [];
-let MISSING_SAMPLES = [];
-let MISSING_VENUE_IMG = [];
-let UNKNOWN_SOURCE = [];
-
-//these should be in the order i want them displayed on the "sort by source" page...
-//NOTE: changing these requires a change to the database as well
-const GAP = 4;//Golden Age Project FC4s
-const AT853 = 5;//AudioTechnica 853s
-const MATRIX_WITH_GAP = 8;//SBD + Golden Age Projects
-const MATRIX_WITH_AT853 = 9;//SBD + AT853
-const MATRIX_WITH_H5 = 10;//SBD + ZoomH5
-const MATRIX_WITH_H6 = 11;//SBD + ZoomH6
-const MATRIX_WITH_H4 = 12;//SBD + ZoomH4n
-const SBD = 20;//Soundboard
-const MBHO = 25;//MBHO (patched into grout's rig)
-const OTHER = 29;//other (anything else will probably be better than the Zoom mics)
-const ZOOMH5 = 34;//ZoomH5
-const ZOOMH6 = 35;//ZoomH6
-const ZOOMH4 = 36;//ZoomH4n
+let MISSING_ARCHIVE: string[] = [];
+let MISSING_ARTIST_SQUARE_IMG: string[] = [];
+let MISSING_ARTIST_WIDE_IMG: string[] = [];
+let MISSING_PCLOUD: string[] = [];
+let MISSING_SAMPLES: string[] = [];
+let MISSING_VENUE_IMG: string[] = [];
+let UNKNOWN_SOURCE: string[] = [];

@@ -1,8 +1,9 @@
-Werx
+The Werx
 04-02-17
 Hi Fi Music Hall
 Eugene, OR
-https://my.pcloud.com/publink/show?code=XZEBse7Z6xcYLRAICQbOw5PxF1nn0HuAHWSk
+https://u.pcloud.link/publink/show?code=XZN93F5Z4sPoyU0tXl8sOQiiWLUuJy02z6iy
+https://archive.org/details/werks2017-04-02.zoomh5
 
 [show] (130:39)
 1. Alive (12:05)
@@ -18,5 +19,9 @@ encore:
 
 source: ZoomH5 internal mics > sd card > audacity > you
 location: placed the Zoom on the speakers directly in front of the band, they had earpieces and thus no monitors, the music came out nice'n'clear, but the vocals are fairly faint.
-taped by: davpeterson
+taper: davpeterson
 taper notes: their written setlist contained Allive, Drop, Type II, OG, The Answer, Sane Remix, Moving On, Rollin', Finding Destiny, and Galactic Passport 
+
+this show is available on the internet archive here:
+https://archive.org/details/werks2017-04-02.zoomh5
+

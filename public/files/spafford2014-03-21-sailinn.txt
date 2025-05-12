@@ -1,26 +1,27 @@
 Spafford
 03-21-14
 The Sail Inn
+outdoor stage
 Tempe, AZ
-https://archive.org/details/spafford2014-03-21.sbd_zoomh4n
-https://my.pcloud.com/publink/show?code=XZ5Bse7Z1zmlNXCtU5yxvIx2rtEdabSNkoqk
 
-[show] (149:08)
+[show] (149:12)
 set 1:
-1. Leave the Light On (15:25)
-2. Feel Like a Stranger (11:07)
-3. Electric Taco Stand (28:03)
-4. Electric Taco Stand reprise (7:58)
-5. Windmill (18:09)
+1. Leave the Light On (15:18)
+2. Feel Like a Stranger (11:08)
+3. Electric Taco Stand (28:02)
+4. Electric Taco Stand reprise (7:59)
+5. Windmill (18:01)
 set 2:
-6. Ain't That Wrong # (16:05)
-7. The Postman (16:47)
-8. Weasel (22:42)
+6. ...banter... (0:44)
+7. Ain't That Wrong # (16:05)
+8. The Postman (17:01)
+9. Weasel (23:34)
 encore:
-9. Backwoods Funk (12:52)
+10. Backwoods Funk (11:20)
 
-# with Taylor Tessler?
+# with Taylor Tesler (guitar) from Brewed to Perfection (another great old-school phx band).
 
-source: SBD + ZoomH4n internal mics > sd card > audacity > you
+source: ZoomH4n internal mics + SBD > sd card > audacity > you
 location: directly in front of SBD on mic stand 20' from stagelip.
-taper: davpeterson
+taper: davpeterson, remastered july2024
+

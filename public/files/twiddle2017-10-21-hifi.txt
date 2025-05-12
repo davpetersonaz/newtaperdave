@@ -2,29 +2,28 @@ Twiddle
 10-21-17
 Hi Fi Music Hall
 Eugene, OR
-https://my.pcloud.com/publink/show?code=XZwBse7ZVjzDds6RypJ1yJOzrjQCkzSRgH8k
 
-[show] (125:25)
+[show] (129:16)
 set 1:
-1. Subconscious Prelude (10:07)
-2. Blunderbuss (6:44)
-3. Drifter (7:58)
-4. Dr. Remidi's Melodium (19:51)
-5. Mamunes the Faun # (7:05)
-6. Daydream Farmer (7:20)
+1. Subconscious Prelude (10:08)
+2. Blunderbuss (6:45)
+3. Drifter (7:57)
+4. Dr. Remidi's Melodium (19:50)
+5. Mamunes the Faun (7:05)
+6. Daydream Farmer (7:16)
 set 2:
-7. Earth Mama (15:14)
-8. Peas and Carrots (6:13)
-9. Wildfire (5:37)
+7. Earth Mama (15:10)
+8. Peas and Carrots (6:14)
+9. Wildfire (5:38)
 10. Zazu's Flight (14:40)
 11. Polluted Beauty (20:27)
 encore:
-12. Classical Gas (8:09)
-
-# with Felix Blades (from Blue Lotus) on guitar.
+12. Classical Gas (8:06)
 
 source: ZoomH5 internal mics > extreme sd card > audacity > you
 taper: davpeterson
-location: placed in the SBD area on an 8' mic stand.
+location: placed in the SBD area on an 8' mic stand (thanks grout!).
 
-sbd available from the band here: http://twiddlemusic.com/releases/102117-hifi-music-hall-eugene-or/
+sbd available from the band here: 
+http://twiddlemusic.com/releases/102117-hifi-music-hall-eugene-or/
+

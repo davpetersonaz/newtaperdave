@@ -1,6 +1,8 @@
 
-import FrequentBandSkeleton from '@/app/ui/skeletons';
-
-export default function Loading() {
-	return <FrequentBandSkeleton />;
+export default function Loading(){
+	return (
+		<div className="min-h-screen bg-gray-100 flex items-center justify-center">
+			Loading...
+		</div>
+	);
 }

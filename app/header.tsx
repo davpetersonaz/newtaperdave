@@ -1,7 +1,8 @@
 
 import Link from 'next/link';
 import { FaTwitter, FaGithub } from 'react-icons/fa';
-import MyDropdown from '@/app/ui/dropdown';
+import MyDropdown from './ui/dropdown';
+import { ComponentType } from 'react';
 
 // Define the Header component
 export default function Header(){
@@ -21,11 +22,10 @@ export default function Header(){
 					</ul>
 				</nav>
 				*/}
-				{/* Social media icons 
+				{/* Social media icons */}
 				<div className="hidden md:block">
 					<SocialIcons />
 				</div>
-				*/}
 				{/* Add Mobile Navigation Toggle Here */}
 			</div>
 		</header>
@@ -34,15 +34,17 @@ export default function Header(){
 
 // Define the SocialIcons component
 function SocialIcons() {
+	const TwitterIcon = FaTwitter as ComponentType<{ className?: string }>;
+	const GithubIcon = FaGithub as ComponentType<{ className?: string }>;
 	return (
 		<div className="flex gap-x-4">
 			{/* Twitter icon */}
-			<a href="https://twitter.com/Jordan_Thirkle" target="_blank" rel="noopener noreferrer" >
-				<FaTwitter className="text-white hover:text-gray-300" />
+			<a href="https://x.com/Jordan_Thirkle" target="_blank" rel="noopener noreferrer" >
+				<TwitterIcon className="text-white hover:text-gray-300" />
 			</a>
 			{/* GitHub icon */}
 			<a href="https://github.com/jordan-thirkle" target="_blank" rel="noopener noreferrer" >
-				<FaGithub className="text-white hover:text-gray-300" />
+				<GithubIcon className="text-white hover:text-gray-300" />
 			</a>
 			{/* Add more social media icons as needed */}
 		</div>

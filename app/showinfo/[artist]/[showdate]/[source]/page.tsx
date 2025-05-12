@@ -1,34 +1,51 @@
 
+//app/showinfo/[artist]/[showdate]/[source]/page.tsx
 import Image from 'next/image';
 import Link from 'next/link';
-import { getShow } from '@/app/lib/database';
+import { getShow } from '@/lib/database';
+import { ShowInfo } from '@/types/ShowInfoType';
 
 export default async function Page({ params }: { params: { artist:string, showdate:string, source:string } }){
 	console.warn('showinfo', params.artist, params.showdate, params.source);
-	const showinfo = await getShow(decodeURIComponent(params.artist), params.showdate, params.source);
+	const showinfo: ShowInfo | null = await getShow(decodeURIComponent(params.artist), params.showdate, params.source);
 	console.warn('showinfo', showinfo);
-	const artist_image = (showinfo.artist_square === '' 
+	if (!showinfo) {
+		return <div>Show not found</div>;
+	}
+	
+	const artist_image = (showinfo.artist_square === '' || !showinfo.artist_square  
 			? (<p className='text-4xl font-bold'>{showinfo.artist}</p>) 
-			: (<Image src={showinfo.artist_square} alt={showinfo.artist} height={showinfo.artist_square_h} width={showinfo.artist_square_w} className='mx-auto pb-4'/>) );
-	const venue_image = (showinfo.venue_logo === '' 
-			? (<p className='text-3xl font-bold pb-8'>{showinfo.venue}</p>)
-			: (<Image src={showinfo.venue_logo} alt={showinfo.venue} height={showinfo.venue_logo_h} width={showinfo.venue_logo_w} className='mx-auto pt-4 pb-8'/>) );
-	const pcloud_link = (showinfo.pcloudlink === '' 
-			? <></>
-			:(<Link href={showinfo.pcloudlink} className='pb-8'>Link to MP3 Download on pCloud</Link>));
-	const sample = (showinfo.samplefile === ''
-			?	<></>
-			:	<>
+			: (<Image src={showinfo.artist_square} alt={showinfo.artist || 'Artist'} height={showinfo.artist_square_h || 0} width={showinfo.artist_square_w || 0} className='mx-auto pb-4'/>) );
+	const venue_image = (showinfo.venue_logo === '' || !showinfo.venue_logo 
+			?	(<p className='text-3xl font-bold pb-8'>{showinfo.venue}</p>)
+			:	(<Image src={showinfo.venue_logo} alt={showinfo.venue || 'Venue'} height={showinfo.venue_logo_h || 0} width={showinfo.venue_logo_w || 0} className='mx-auto pt-4 pb-8'/>) );
+	const pcloud_link = (showinfo.pcloudlink === '' || !showinfo.pcloudlink
+			?	(<></>)
+			:	(<Link href={showinfo.pcloudlink} className='pb-8'>Link to MP3 Download on pCloud</Link>) );
+	const sample = (showinfo.samplefile && showinfo.samplefile !== ''
+			?	(<>
 					<div className='mt-8 pt-3 border-2 border-black border-solid rounded'>
 						<p>20-second sample</p>
 						<audio controls className='w-300 h-54 m-0 mx-auto'>
-							<source src={showinfo.samplefile.substring(8)} type='audio/mpeg' className='' />
+							<source src={showinfo.samplefile!.substring(8)} type='audio/mpeg' className='' />
 						</audio>
 					</div>
-				</>);
-	const setlist = JSON.parse(showinfo.setlist);
-	let i = 1;//the key is not going to change, and we have nothing else to use to uniquely identify the line.
-	const setlist_str = setlist.map(line => line === '' ? ( <br key={i++}/> ) : ( <li key={i++}>{line === '' ? '  ' : line}</li> ) );
+				</>)
+			:	(<></>) );
+				
+	// Parse setlist safely into string[]
+	let setlist: string[];
+	try {
+		setlist = showinfo.setlist ? JSON.parse(showinfo.setlist) : [];
+	} catch (error) {
+		console.error('Failed to parse setlist:', error);
+		setlist = [];
+	}
+	// Map setlist to JSX elements
+	const setlist_str = setlist.map((line, index) =>
+		line === '' ? <br key={index} /> : <li key={index}>{line}</li>
+	);
+	
 	return (
 		<div className='text-center'> 
 			<div className='grid grid-cols-2 gap-16'>

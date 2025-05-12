@@ -1,34 +1,30 @@
 
+//app/ui/frequent-bands.tsx
+import React from 'react';
 import Image from "next/legacy/image";
 import Link from 'next/link';
-import { logoToArtistCamel } from '@/app/lib/util'; 
-import { getFeaturedBands } from '@/app/lib/database';
+import { logoToArtistCamel } from '@/lib/util'; 
 
-export default async function FrequentBands(){
-	const bands = await getFeaturedBands();
-	const randoms = [];
-	for(let i=0; i<20 && i<bands.length; i++){
+export default function FrequentBands({ bands }:{ bands:string[] }){
+	const bandSlots = 20;
+	const selectedBands = [];
+	
+	//randomize bands
+	for(let i=0; i<bandSlots && i<bands.length; i++){
 		const randompos = Math.floor(Math.random() * bands.length);
 		const randomlogo = bands.splice(randompos, 1)[0];
-		randoms.push(randomlogo);
+		selectedBands.push(randomlogo);
 	}
-//	console.warn('featured', randoms);
-	return (
+	
+	return(
 		<>
-			{randoms.map(logo=>{
-				return (<Logo name={logo} key={logo} />);
-			})}
+			{selectedBands.map((logo) => (
+				<div className="relative h-40 w-64 gap-4 mt-4" key={logo}>
+					<Link href={"/showlist#"+logoToArtistCamel(logo)}>
+						<Image src={logo} alt={logo} layout="fill" objectFit="contain" />
+					</Link>
+				</div>
+			))}
 		</>
-	);
-}
-
-//using the Image tag in the default function is not allowed, it makes this file a client component (somehow)
-export function Logo({ name }: { name: string; }){
-	return (
-		<div className="relative h-40 w-64 gap-4 mt-4">
-			<Link href={"/showlist#"+logoToArtistCamel(name)}>
-				<Image src={name} alt={name} layout="fill" objectFit="contain" />
-			</Link>
-		</div>
 	);
 }

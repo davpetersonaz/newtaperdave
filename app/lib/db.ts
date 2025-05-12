@@ -1,16 +1,22 @@
 
+//app/lib/db.ts
 import { Pool } from "pg";
 import 'dotenv/config';
 
-let conn: Pool;
-if(!conn){
-	conn = new Pool({
-		user: process.env.PGSQL_USER,
-		host: process.env.PGSQL_HOST,
-		database: process.env.PGSQL_DATABASE,
-		password: process.env.PGSQL_PASSWORD,
-		port: process.env.PGSQL_PORT,
-	});
+// Convert port from string | undefined to number | undefined
+const port = process.env.PGSQL_PORT ? parseInt(process.env.PGSQL_PORT, 10) : 5432;
+const conn: Pool = new Pool({
+    user: process.env.PGSQL_USER,
+    host: process.env.PGSQL_HOST,
+    database: process.env.PGSQL_DATABASE,
+    password: process.env.PGSQL_PASSWORD,
+    port: port,
+});
+
+// Generic database query function
+export async function doSelect<T>(query:string, values?:any[]):Promise<T[]> {
+	const result = ( values ? await conn.query(query, values) : await conn.query(query) );
+	return result.rows;
 }
 
 export default conn;
