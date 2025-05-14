@@ -29,7 +29,7 @@ export default function RootLayout({
 				<Header />
 				<NavLinks />
 				<Suspense fallback={<Loading />}>
-					<main className="mb-auto relative flex pb-20 flex-col mr-6 ml-6">{children}</main>
+					<main className="mb-auto relative flex pb-20 flex-col mr-6 ml-6 pt-17">{children}</main>
 				</Suspense>
 				<Footer />
 			</body>

@@ -2,9 +2,9 @@
 //app/showlist/bycity/page.tsx
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { strip } from '../../lib/util';
 import { generateShowList } from '../components/ShowList';
 import { getShowListCity } from '../../lib/database';
+import ScrollToHash from '@/showlist/components/ScrollToHash';
 
 export const metadata:Metadata = {
 	title: 'List of Shows by City',
@@ -14,7 +14,8 @@ export default async function Page(){
 	const output = await generateShowList(getShowListCity, 'city_state', 'getShowListCity');
 	return (
 		<>
-			<div className='text-center'>
+			<ScrollToHash />
+			<div className='text-center pt-4'>
 				{output}
 			</div>
 			<div className="relative">

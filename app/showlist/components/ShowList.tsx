@@ -48,7 +48,16 @@ export async function generateShowList(getShowList:() => Promise<ShowListItem[]>
                             {shows.map((line) => (
                                 <li key={line.show_id}>
                                     <Link href={`/showinfo/${line.artist}/${line.showdate}/${line.source_num}`}>
-                                        <span className="text-1xl font-bold">{line.artist}</span> - {line.showdate} - {line.venue} - {line.sourcetext}
+                                        {
+                                            groupByKey === 'artist' ?
+                                                ( <><span className="text-1xl font-bold">{line.showdate}</span> - {line.venue} - {line.sourcetext}</> )
+                                            : groupByKey === 'venue' ?
+                                                ( <><span className="text-1xl font-bold">{line.artist}</span> - {line.showdate} - {line.sourcetext}</> )
+                                            : groupByKey === 'sourcetext' ?
+                                                ( <><span className="text-1xl font-bold">{line.artist}</span> - {line.showdate} - {line.venue}</> )
+                                            :
+                                                ( <><span className="text-1xl font-bold">{line.artist}</span> - {line.showdate} - {line.venue} - {line.sourcetext}</> )
+                                        }
                                     </Link>
                                     {line.pcloudlink} {line.archivelink} {line.samplefile}
                                 </li>
