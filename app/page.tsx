@@ -1,4 +1,3 @@
-
 //app/page.tsx
 import SplashImage from '@/ui/splash-image';
 import FrequentBands from '@/ui/frequent-bands';

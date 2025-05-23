@@ -1,4 +1,4 @@
-
+//app/api/readshows/routes.ts
 import fs from 'fs';
 import { existsSync } from 'fs';
 import fsp from 'fs/promises';
