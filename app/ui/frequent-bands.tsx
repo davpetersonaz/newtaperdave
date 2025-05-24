@@ -20,7 +20,7 @@ export default function FrequentBands({ bands }:{ bands:string[] }){
 		<>
 			{selectedBands.map((logo) => (
 				<div className="relative h-40 w-64 gap-4 mt-4" key={logo}>
-					<Link href={`${url}/showlist#${logoToArtistCamel(logo)}`}>
+					<Link href={`${url}/showlist#${logoToArtistCamel(logo)}`} legacyBehavior>
 						<Image src={logo} alt={logo} layout="fill" objectFit="contain" />
 					</Link>
 				</div>

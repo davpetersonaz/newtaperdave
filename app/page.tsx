@@ -65,7 +65,8 @@ export default async function Page(){
 					</p>
 				</div>
 				<div className="text-center mt-8">
-					<Link href="/showlist?s=y"><span className="text-xl">And On to The Music!</span></Link>
+					const url = (process.env.ENVIRONMENT === 'VERCEL' ? 'https://taperdave.vercel.app' : 'https://localhost:3000');
+					<Link href="${url}/showlist?s=y" legacyBehavior><span className="text-xl">And On to The Music!</span></Link>
 					<p className="text-center">here are some of the bands I've taped the most</p>
 					<div className="flex flex-row flex-wrap justify-around pb-8">
 						<Suspense fallback={<FrequentBandSkeleton />}>
