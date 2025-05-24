@@ -1,4 +1,3 @@
-
 //app/showlist/components/ShowList.tsx
 import { ShowListItem, ShowLine } from '@/types/ShowInfoType';
 import { strip } from '../../lib/util';

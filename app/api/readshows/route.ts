@@ -39,6 +39,7 @@ interface Links {
 }
 
 export async function GET(request: Request){
+	console.log('readShows called at:', new Date(), 'Environment:', process.env.NODE_ENV);
 //	console.warn('readShowFiles');
 	try{
 		//reset these
@@ -53,7 +54,7 @@ export async function GET(request: Request){
 		const filenames = await getFilenames();
 //		console.warn('filenames', filenames);
 		await removeAllShows();
-		
+
 		let inc = 0;
 		for(const filename of filenames){
 			console.warn('importing', filename);
@@ -64,7 +65,7 @@ export async function GET(request: Request){
 				continue;
 			}
 			const showInfo: ShowInfo = {};
-			
+
 			// Safely extract artist
 			const artistLine = fileContents.shift();
 			if (!artistLine) {
@@ -89,7 +90,7 @@ export async function GET(request: Request){
 			}
 			const { showdate, showdateplus } = getShowDate(dateLine.trim());
 			showInfo.showdate = showdate;
-			
+
 			const logger: string = `${showInfo.artist} :: ${showInfo.showdate}`;
 			const venueLine = fileContents.shift();
 			if (!venueLine) {
@@ -103,8 +104,8 @@ export async function GET(request: Request){
 			showInfo.venue_logo_w = venue.width;
 			const cityLine = fileContents.shift();
 			if (!cityLine) {
-			  console.warn(`Missing city in file: ${filename}`);
-			  continue;
+				console.warn(`Missing city in file: ${filename}`);
+				continue;
 			}
 			const { city, city_state } = getCity(cityLine.trim());
 			showInfo.city = city;
@@ -123,7 +124,7 @@ export async function GET(request: Request){
 			await addShow(showInfo);
 			inc++;
 		}
-		
+
 		await writeLogFile('missing_archive_links.txt', MISSING_ARCHIVE);
 		await writeLogFile('missing_artist_wide_imgs.txt', MISSING_ARTIST_WIDE_IMG);
 		await writeLogFile('missing_artist_square_imgs.txt', MISSING_ARTIST_SQUARE_IMG);
@@ -131,7 +132,7 @@ export async function GET(request: Request){
 		await writeLogFile('missing_sample_files.txt', MISSING_SAMPLES);
 		await writeLogFile('missing_venue_imgs.txt', MISSING_VENUE_IMG);
 		await writeLogFile('unknown_sources.txt', UNKNOWN_SOURCE);
-		
+
 		// Create caches
 		await Promise.all([
 			createCache(getShowListAlpha),
@@ -140,7 +141,7 @@ export async function GET(request: Request){
 			createCache(getShowListSource),
 			createCache(getShowListVenue),
 		]);
-		
+
 		return NextResponse.json(`imported ${inc} shows into db`);
 	}catch(error){
 		console.error('FileSystem Error:', error);
@@ -249,7 +250,7 @@ function getArtistImages(artist: string): ArtistImages{
 	}else{
 		MISSING_ARTIST_SQUARE_IMG.push(`${artist} :: ${wip}`);
 	}
-	
+
 	files = fs.readdirSync(ARTIST_WIDE_IMG_PATH).filter((fn) => fn.startsWith(wip));
 	console.warn('ARTIST_WIDE_IMG_PATH', ARTIST_WIDE_IMG_PATH, files);
 	if(files.length > 0){
@@ -263,7 +264,7 @@ function getArtistImages(artist: string): ArtistImages{
 	}
 
 	console.warn('getArtistImages', result);
-	return result;	
+	return result;
 }
 
 function getShowDate(line:string): ShowDate {
@@ -294,7 +295,7 @@ function getVenue(line:string, logger:string): Venue{
 	}else{
 		MISSING_VENUE_IMG.push(`${stripped} :: ${logger}`);
 	}
-	return result;	
+	return result;
 }
 
 function getCity(line:string): City {
@@ -318,12 +319,12 @@ function getLinks(fileContents:string[], logger:string): Links {
 		}
 		possibleLink = fileContents.shift()?.trim();
 	}
-	if(!result.pcloud){ 
-		console.warn('MISSING: pcloud link', logger); 
+	if(!result.pcloud){
+		console.warn('MISSING: pcloud link', logger);
 		MISSING_PCLOUD.push(logger);
 	}
-	if(!result.archive){ 
-		console.warn('MISSING: archive link', logger); 
+	if(!result.archive){
+		console.warn('MISSING: archive link', logger);
 		MISSING_ARCHIVE.push(logger);
 	}
 	return result;
@@ -367,7 +368,7 @@ const MP3_PATH = './public/music/';
 const OUTPUT_PATH = './public/output/';
 const PATH = './public/files/';
 const VENUE_IMG_PATH = './public/images/venues/';
-	
+
 //logging files
 let MISSING_ARCHIVE: string[] = [];
 let MISSING_ARTIST_SQUARE_IMG: string[] = [];

@@ -1,4 +1,3 @@
-
 //app/ui/frequent-bands.tsx
 import React from 'react';
 import Image from "next/legacy/image";

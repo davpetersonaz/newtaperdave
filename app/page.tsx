@@ -44,7 +44,7 @@ export default async function Page(){
 					<p>
 						I will eventually put everything on{" "}
 						<Link href="https://archive.org/details/@taper-dave">The Internet Archive</Link>,{" "}
-						however {"I'll"} probably be somewhat selective on that so it will happen slowly (as I catch up with backlog).
+						however I'll probably be somewhat selective on that so it will happen slowly (as I catch up with backlog).
 					</p>
 					<p>
 						Keep in mind some recordings are better than others for a variety of reasons{" "}
@@ -60,13 +60,13 @@ export default async function Page(){
 						And, <span className="italic">buy their merchandise!</span>{" "}
 						And buy their studio albums -- alot of these bands exhibit different sides of themselves in the studio vs on the road!{" "}
 						They are great people and love to get down and have a good time,{" "}
-						and a recording can only capture <span className="italic">one</span> aspect of a {"band's"} performance,{" "}
+						and a recording can only capture <span className="italic">one</span> aspect of a band's performance,{" "}
 						so go experience the <span className="italic">whole thing</span> for yourself!!
 					</p>
 				</div>
 				<div className="text-center mt-8">
-					<Link href="https://taperdave.com/showlist.php?s=y"><span className="text-xl">And On to The Music!</span></Link>
-					<p className="text-center">here are some of the bands {"I've"} taped the most</p>
+					<Link href="https://taperdave.com/showlist?s=y"><span className="text-xl">And On to The Music!</span></Link>
+					<p className="text-center">here are some of the bands I've taped the most</p>
 					<div className="flex flex-row flex-wrap justify-around pb-8">
 						<Suspense fallback={<FrequentBandSkeleton />}>
 							<FrequentBands bands={bands} /> {/* pass bands as a prop */}

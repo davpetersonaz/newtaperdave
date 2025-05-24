@@ -1,4 +1,3 @@
-
 //app/api/readshows/database.ts
 import conn, { doSelect } from '@/lib/db';
 import { ShowInfo, ShowListItem } from '@/types/ShowInfoType';
@@ -51,14 +50,28 @@ export async function removeAllShows(): Promise<number> {
 }
 
 export async function createCache(fetchXXX: () => Promise<ShowInfo[]>): Promise<void> {
-	const fetchArray = await fetchXXX();
-//	console.log('fetchArray', fetchArray);
-	const query = `UPDATE query_cache
-					SET result = $2
-					WHERE query = $1`;
-	const values = [ fetchXXX.name, JSON.stringify(fetchArray) ];
-	const result = await conn.query(query, values);
-	console.log('cached:', fetchXXX.name);
+	try {
+		const fetchArray = await fetchXXX();
+		if (!Array.isArray(fetchArray)) {
+			console.error(`Invalid fetchArray for ${fetchXXX.name}:`, fetchArray);
+			return;
+		}
+		const query = `
+			INSERT INTO query_cache (query, result)
+			VALUES ($1, $2)
+			ON CONFLICT (query)
+			DO UPDATE SET result = EXCLUDED.result
+		`;
+		const values = [fetchXXX.name.toLowerCase(), JSON.stringify(fetchArray)];
+		const result = await conn.query(query, values);
+		if (result.rowCount !== null && result.rowCount > 0) {
+			console.log(`Cached: ${fetchXXX.name}, rows affected: ${result.rowCount}`);
+		} else {
+			console.warn(`No rows affected for ${fetchXXX.name}`);
+		}
+	} catch (error) {
+		console.error(`Failed to cache ${fetchXXX.name}:`, error);
+	}
 }
 
 //these should be in the order i want them displayed on the "sort by source" page...

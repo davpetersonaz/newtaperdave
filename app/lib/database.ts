@@ -1,4 +1,3 @@
-
 //app/lib/database.ts
 import conn, { doSelect } from '@/lib/db';
 import { ShowInfo, ShowListItem } from '@/types/ShowInfoType';
@@ -83,23 +82,19 @@ export async function getFeaturedBands():Promise<string[]>{
 	return namesOnly;
 }
 
-export async function getQueryCache(querystring: string):Promise<string>{
-	const query = `SELECT result
-					FROM query_cache
-					WHERE query=$1`;
-	const values = [ querystring ];
-	const rows = await doSelect<{ result: string }>(query, values);
-//	console.warn('result.rows', typeof result.rows, result.rows);
-//	console.warn('result.rows[0].result', typeof result.rows[0].result, result.rows[0].result);
-	return (rows[0].result ? rows[0].result : '');
+export async function getQueryCache(querystring: string): Promise<string> {
+  const query = `SELECT result FROM query_cache WHERE query=$1`;
+  const values = [querystring.toLowerCase()];
+  const rows = await doSelect<{ result: string }>(query, values);
+  return rows.length > 0 ? rows[0].result : '';
 }
 
 export async function checkConnection(): Promise<void> {
     try {
         await conn.query('SELECT 1');
-        console.info('Database connection is alive.');
+        console.log('Database connected successfully');
     } catch (error) {
-        console.error('Database connection failed:', error);
+        console.error('Database connection error:', error);
         throw error;
     }
 }

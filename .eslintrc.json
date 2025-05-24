@@ -13,7 +13,8 @@
         "minimumDescriptionLength": 10
       }
     ],
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    "react/no-unescaped-entities": ["error", { "forbid": [">", "}", "<", "{"] }] // Allow ' in text nodes
   },
   "settings": {
     "react": {

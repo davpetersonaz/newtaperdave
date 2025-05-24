@@ -10,9 +10,9 @@ const conn: Pool = new Pool({
 });
 
 // Generic database query function
-export async function doSelect<T>(query: string, values?: any[]): Promise<T[]> {
-	const result = ( values ? await conn.query(query, values) : await conn.query(query) );
-	return result.rows;
+export async function doSelect<T>(query: string, values?: (string | number | boolean | null)[]): Promise<T[]> {
+    const result = values ? await conn.query(query, values) : await conn.query(query);
+    return result.rows;
 }
 
 export default conn;
