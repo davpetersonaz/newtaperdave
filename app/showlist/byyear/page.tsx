@@ -1,4 +1,3 @@
-
 //app/showlist/byyear/page.tsx
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -11,7 +10,7 @@ export const metadata:Metadata = {
 }
 
 export default async function Page(){
-	const output = await generateShowList(getShowListChrono, 'year', 'getShowListChrono');
+	const output = await generateShowList('year', 'getShowListChrono');
 	return (
 		<>
 			<ScrollToHash />
@@ -19,7 +18,7 @@ export default async function Page(){
 				{output}
 			</div>
 			<div className="relative">
-				<Link href="/api/readshows" className="float-right">Regenerate Shows</Link>
+				<Link href="/api/readshows" prefetch={false} className="float-right">Regenerate Shows</Link>
 			</div>
 		</>
 	);

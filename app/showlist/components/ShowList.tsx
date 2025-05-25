@@ -10,9 +10,12 @@ import { imageSize } from 'image-size';
 import path from 'path';
 import { promises as fs } from 'fs';
 
-export async function generateShowList(getShowList:() => Promise<ShowListItem[]>, groupByKey:keyof ShowListItem | 'year', cacheName:string):Promise<JSX.Element[]> {
+export async function generateShowList(groupByKey:keyof ShowListItem | 'year', cacheName:string):Promise<JSX.Element[]> {
     const cached = await getQueryCache(cacheName);
-    const showlist:ShowListItem[] = (cached === '' ? await getShowList() : JSON.parse(cached) as ShowListItem[]);
+    if (!cached) {
+        throw new Error(`Cache not found for ${cacheName}`);
+    }
+    const showlist:ShowListItem[] = JSON.parse(cached) as ShowListItem[];
     console.warn('showlist', showlist.length);
 
     const output:JSX.Element[] = [];

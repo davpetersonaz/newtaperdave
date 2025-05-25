@@ -15,6 +15,7 @@ export default async function Page(){
 		}
 		const splashImage = await fetchSplashImage();// fetch image
 		const bands = await getFeaturedBands(); //fetch bands
+		const url = (process.env.ENVIRONMENT === 'VERCEL' ? 'https://taperdave.vercel.app' : 'http://localhost:3000');
 		return (
 			<div className="min-h-screen bg-gray-100">
 				<SplashImage src={splashImage} /> {/* Pass data as a prop */}
@@ -65,8 +66,7 @@ export default async function Page(){
 					</p>
 				</div>
 				<div className="text-center mt-8">
-					const url = (process.env.ENVIRONMENT === 'VERCEL' ? 'https://taperdave.vercel.app' : 'https://localhost:3000');
-					<Link href="${url}/showlist?s=y" legacyBehavior><span className="text-xl">And On to The Music!</span></Link>
+					<Link href="${url}/showlist?s=y"><span className="text-xl">And On to The Music!</span></Link>
 					<p className="text-center">here are some of the bands I've taped the most</p>
 					<div className="flex flex-row flex-wrap justify-around pb-8">
 						<Suspense fallback={<FrequentBandSkeleton />}>

@@ -1,4 +1,4 @@
-//app/api/readshows/routes.ts
+//app/api/readshows/route.ts
 import fs from 'fs';
 import { existsSync } from 'fs';
 import fsp from 'fs/promises';
@@ -40,7 +40,6 @@ interface Links {
 
 export async function GET(request: Request){
 	console.log('readShows called at:', new Date(), 'Environment:', process.env.NODE_ENV);
-//	console.warn('readShowFiles');
 	try{
 		//reset these
 		MISSING_ARCHIVE = [];
@@ -52,12 +51,12 @@ export async function GET(request: Request){
 		UNKNOWN_SOURCE = [];
 
 		const filenames = await getFilenames();
-//		console.warn('filenames', filenames);
+//		console.info('filenames', filenames);
 		await removeAllShows();
 
 		let inc = 0;
 		for(const filename of filenames){
-			console.warn('importing', filename);
+			console.info('importing', filename);
 			const fileContents: string[] = await readFile(filename);
 			// Skip empty or invalid files
 			if (!fileContents.length) {
@@ -76,7 +75,7 @@ export async function GET(request: Request){
 			showInfo.artist_sort = getArtistSort(showInfo.artist);
 			// Extract other fields with safety checks
 			showInfo.sources = getSource(fileContents, filename);
-			const artist_images = getArtistImages(showInfo.artist!);
+			const artist_images = await getArtistImages(showInfo.artist!);
 			showInfo.artist_wide = artist_images.wide_image;
 			showInfo.artist_wide_h = artist_images.wide_height;
 			showInfo.artist_wide_w = artist_images.wide_width;
@@ -97,7 +96,7 @@ export async function GET(request: Request){
 				console.warn(`Missing venue in file: ${filename}`);
 				continue;
 			}
-			const venue: Venue = getVenue(venueLine.trim(), logger);
+			const venue: Venue = await getVenue(venueLine.trim(), logger);
 			showInfo.venue = venue.name;
 			showInfo.venue_logo = venue.image;
 			showInfo.venue_logo_h = venue.height;
@@ -107,15 +106,17 @@ export async function GET(request: Request){
 				console.warn(`Missing city in file: ${filename}`);
 				continue;
 			}
+			console.warn('fileContents after extracting city:', fileContents);
 			const { city, city_state } = getCity(cityLine.trim());
 			showInfo.city = city;
 			showInfo.city_state = city_state;
 			const { pcloud, archive } = getLinks(fileContents, logger);
+			console.warn('fileContents after extracting pcloud/archive:', fileContents);
 			showInfo.pcloudlink = pcloud;
 			showInfo.archivelink = archive;
 			showInfo.setlist = JSON.stringify(getTheRest(fileContents));
-			showInfo.samplefile = getSampleFile(showInfo.artist!, showInfo.showdate!, showdateplus);
-			console.warn('showInfo', showInfo);
+			showInfo.samplefile = await getSampleFile(showInfo.artist!, showInfo.showdate!, showdateplus);
+			console.info('showInfo', showInfo);
 			// Validate required fields
 			if (!showInfo.artist || !showInfo.showdate || !showInfo.venue || !showInfo.city) {
 				console.warn(`Skipping incomplete showInfo for file: ${filename}`);
@@ -125,13 +126,17 @@ export async function GET(request: Request){
 			inc++;
 		}
 
-		await writeLogFile('missing_archive_links.txt', MISSING_ARCHIVE);
-		await writeLogFile('missing_artist_wide_imgs.txt', MISSING_ARTIST_WIDE_IMG);
-		await writeLogFile('missing_artist_square_imgs.txt', MISSING_ARTIST_SQUARE_IMG);
-		await writeLogFile('missing_pcloud_links.txt', MISSING_PCLOUD);
-		await writeLogFile('missing_sample_files.txt', MISSING_SAMPLES);
-		await writeLogFile('missing_venue_imgs.txt', MISSING_VENUE_IMG);
-		await writeLogFile('unknown_sources.txt', UNKNOWN_SOURCE);
+		if(process.env.NODE_ENV === 'development'){
+			await Promise.all([
+				writeLogFile('missing_archive_links.txt', MISSING_ARCHIVE),
+				writeLogFile('missing_artist_wide_imgs.txt', MISSING_ARTIST_WIDE_IMG),
+				writeLogFile('missing_artist_square_imgs.txt', MISSING_ARTIST_SQUARE_IMG),
+				writeLogFile('missing_pcloud_links.txt', MISSING_PCLOUD),
+				writeLogFile('missing_sample_files.txt', MISSING_SAMPLES),
+				writeLogFile('missing_venue_imgs.txt', MISSING_VENUE_IMG),
+				writeLogFile('unknown_sources.txt', UNKNOWN_SOURCE)
+			]);
+		}
 
 		// Create caches
 		await Promise.all([
@@ -145,33 +150,36 @@ export async function GET(request: Request){
 		return NextResponse.json(`imported ${inc} shows into db`);
 	}catch(error){
 		console.error('FileSystem Error:', error);
-		throw new Error('Failed to Read Shows into DB.');
+		const errorMessage = error instanceof Error ? error.message : String(error);
+		throw new Error(`Failed to Read Shows into DB: ${errorMessage}`);
 	}
 }
 
 async function getFilenames(): Promise<string[]> {
 	const dir = path.resolve(PATH);
-//	console.warn('dir', dir);
-	const filenames = fs.readdirSync(dir);
-//	console.warn('filenames', filenames);
-	return filenames;
+//	console.info('dir', dir);
+	try{
+		const filenames = await fsp.readdir(dir);
+		// console.info('filenames', filenames);
+		return filenames;
+	}catch(error){
+		console.error(`Error reading directory ${dir}:`, error);
+		return [];
+	}
 }
 
 async function readFile(filename:string): Promise<string[]> {
-	const fileContents = await fsp.readFile(PATH + filename);
-	const fcs = fileContents.toString();
-
-	//the following line filters out empty lines after splitting...
-//	const result = fcs.split('\n').filter((line) => line.trim() !== '');
-	//or, as i initially intended...
-	const result = fcs.split("\n");
-
-//	console.warn('result', result);
-	return result;
+	try{
+		const fileContents = await fsp.readFile(PATH + filename, 'utf-8');
+		return fileContents.split('\n');
+	}catch(error){
+		console.error(`Error reading file ${filename}:`, error);
+		return [];
+	}
 }
 
 function getSource(fileContents: string[], filename: string): number {
-	const sourceLine = fileContents.filter((line) => line.includes("source: "))[0];
+	const sourceLine = fileContents.find((line) => line.includes("source: "));
 	let source = OTHER;
 	if(sourceLine){
 		const sourceLower = sourceLine.toLowerCase();
@@ -224,8 +232,8 @@ function getArtistSort(line: string): string{
 	return result;
 }
 
-function getArtistImages(artist: string): ArtistImages{
-	console.warn('getArtistImages', artist);
+async function getArtistImages(artist: string): Promise<ArtistImages>{
+	console.info('getArtistImages', artist);
 	const result: ArtistImages = {
 		square_image: '',
 		square_height: 0,
@@ -234,36 +242,52 @@ function getArtistImages(artist: string): ArtistImages{
 		wide_height: 0,
 		wide_width: 0,
 	};
-	let wip: string = artist;
+	let wip:string = artist;
 	if(wip.substring(0, 4) === 'The '){ wip = wip.substring(4) + 'The'; }
 	wip = strip(wip) + 'Logo';
-	console.warn('artist-logo wip', wip);
+	console.info('getArtistImages wip', wip);
 
-	let files: string[] = fs.readdirSync(ARTIST_SQUARE_IMG_PATH).filter((fn) => fn.startsWith(wip));
-	console.warn('ARTIST_SQUARE_IMG_PATH', ARTIST_SQUARE_IMG_PATH, files);
-	if(files.length > 0){
-		result.square_image = ARTIST_SQUARE_IMG_PATH + files.shift();
-		const dimensions = sizeOf(result.square_image);
-		result.square_height = dimensions.height!;
-		result.square_width = dimensions.width!;
-		result.square_image = result.square_image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
-	}else{
+	try{
+		const squareFiles = (await fsp.readdir(ARTIST_SQUARE_IMG_PATH)).filter((fn) => fn.startsWith(wip));
+		console.info('squareFiles filtered:', squareFiles);
+		if(squareFiles.length > 0){
+			result.square_image = ARTIST_SQUARE_IMG_PATH + squareFiles[0];
+			console.info('result.square_image:', result.square_image);
+			const dimensions = sizeOf(result.square_image);
+			console.info('dimensions:', dimensions);
+			result.square_height = dimensions.height!;
+			result.square_width = dimensions.width!;
+			result.square_image = result.square_image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
+		}else{
+			console.warn('No square image found for:', artist, wip);
+			MISSING_ARTIST_SQUARE_IMG.push(`${artist} :: ${wip}`);
+		}
+	} catch (error) {
+		console.error(`Error reading square artist image for ${artist}:`, error);
 		MISSING_ARTIST_SQUARE_IMG.push(`${artist} :: ${wip}`);
 	}
 
-	files = fs.readdirSync(ARTIST_WIDE_IMG_PATH).filter((fn) => fn.startsWith(wip));
-	console.warn('ARTIST_WIDE_IMG_PATH', ARTIST_WIDE_IMG_PATH, files);
-	if(files.length > 0){
-		result.wide_image = ARTIST_WIDE_IMG_PATH +files.shift();
-		const dimensions = sizeOf(result.wide_image);
-		result.wide_height = dimensions.height!;
-		result.wide_width = dimensions.width!;
-		result.wide_image = result.wide_image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
-	}else{
+	try{
+		const wideFiles = (await fsp.readdir(ARTIST_WIDE_IMG_PATH)).filter((fn) => fn.startsWith(wip));
+		console.info('wideFiles filtered:', wideFiles);
+		if(wideFiles.length > 0){
+			result.wide_image = ARTIST_WIDE_IMG_PATH + wideFiles[0];
+			console.info('result.wide_image:', result.wide_image);
+			const dimensions = sizeOf(result.wide_image);
+			console.info('dimensions:', dimensions);
+			result.wide_height = dimensions.height!;
+			result.wide_width = dimensions.width!;
+			result.wide_image = result.wide_image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
+		}else{
+			console.warn('No wide image found for:', artist, wip);
+			MISSING_ARTIST_WIDE_IMG.push(`${artist} :: ${wip}`);
+		}
+	} catch (error) {
+		console.error(`Error reading wide artist image for ${artist}:`, error);
 		MISSING_ARTIST_WIDE_IMG.push(`${artist} :: ${wip}`);
 	}
 
-	console.warn('getArtistImages', result);
+	console.info('getArtistImages', result);
 	return result;
 }
 
@@ -277,22 +301,27 @@ function getShowDate(line:string): ShowDate {
 	return result;
 }
 
-function getVenue(line:string, logger:string): Venue{
+async function getVenue(line:string, logger:string): Promise<Venue>{
 	const result: Venue = { name: line, image: '', height: 0, width: 0 };
 	let venueName = line;
 	if(venueName.substring(0, 4) === 'The '){
 		venueName = venueName.substring(4) + 'The';
 	}
 	const stripped = strip(venueName) + 'Logo';
-	const files = fs.readdirSync(VENUE_IMG_PATH).filter((fn) => fn.startsWith(stripped));
-	console.warn('VENUE_IMG_PATH', VENUE_IMG_PATH, files);
-	if(files.length > 0){
-		result.image = VENUE_IMG_PATH + files.shift();
-		const dimensions = sizeOf(result.image);
-		result.height = dimensions.height!;
-		result.width = dimensions.width!;
-		result.image = result.image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
-	}else{
+
+	try{
+		const files = (await fsp.readdir(VENUE_IMG_PATH)).filter((fn) => fn.startsWith(stripped));
+		if(files.length > 0){
+			result.image = VENUE_IMG_PATH + files[0];
+			const dimensions = sizeOf(result.image);
+			result.height = dimensions.height!;
+			result.width = dimensions.width!;
+			result.image = result.image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
+		}else{
+			MISSING_VENUE_IMG.push(`${stripped} :: ${logger}`);
+		}
+	}catch(error){
+		console.error(`Error reading venue images for ${logger}:`, error);
 		MISSING_VENUE_IMG.push(`${stripped} :: ${logger}`);
 	}
 	return result;
@@ -310,7 +339,7 @@ function getLinks(fileContents:string[], logger:string): Links {
 	const result:Links = { 'pcloud': '', 'archive': '' };
 	let possibleLink = fileContents.shift()?.trim();
 	while(possibleLink){
-//		console.warn('possibleLink', possibleLink);
+//		console.info('possibleLink', possibleLink);
 		if(possibleLink.includes('my.pcloud.com') || possibleLink.includes('u.pcloud.link')){
 			result.pcloud = possibleLink;
 		}else
@@ -334,20 +363,22 @@ function getTheRest(fileContents:string[]): string[] {
 	const result: string[] = [];
 	while(fileContents.length > 0){
 		const line = fileContents.shift()?.trim();
-		if (line) result.push(line);
+		if (line){ result.push(line); }
 	}
 	return result;
 }
 
-function getSampleFile(artist:string, showdate:string, showdateplus:string):string{
+async function getSampleFile(artist:string, showdate:string, showdateplus:string):Promise<string>{
 	let result = '';
 	const artist_temp = (artist.substring(0, 4) === 'The ' ? artist.substring(4) + ', The' : artist);
 	const artist_stripped = strip(artist_temp).toLowerCase();
 	const possibleSampleFile = artist_stripped + showdate + showdateplus + '.mp3';
-	console.warn('possibleSampleFile', possibleSampleFile);
-	if(existsSync(MP3_PATH + possibleSampleFile)){
-		result = MP3_PATH + possibleSampleFile;
-	}else{
+	console.info('possibleSampleFile', possibleSampleFile);
+	const filePath = MP3_PATH + possibleSampleFile;
+	try {
+		await fsp.access(filePath);
+		result = filePath.substring(8); // Remove './public' from path-joined url
+	} catch (error) {
 		console.warn('MISSING: sample file', possibleSampleFile);
 		MISSING_SAMPLES.push(`${possibleSampleFile} :: ${artist} :: ${showdate}`);
 	}
@@ -355,11 +386,19 @@ function getSampleFile(artist:string, showdate:string, showdateplus:string):stri
 }
 
 async function writeLogFile(filename:string, data:string[]): Promise<void> {
-	let output = '';
-	data.sort();
-	data.forEach((line) => (output = output + line + '\n'));
-	await fs.writeFileSync(OUTPUT_PATH + filename, output);
-	console.warn('wrote log file', filename);
+	if (process.env.NODE_ENV !== 'development') {
+		console.info('Skipping log file write in production:', filename, data);
+		return;
+	}
+	try{
+		let output = '';
+		data.sort();
+		data.forEach((line) => (output += line + '\n'));
+		await fsp.writeFile(OUTPUT_PATH + filename, output);
+		console.info('wrote log file', filename);
+	}catch(error){
+		console.error(`Error writing log file ${filename}:`, error);
+	}
 }
 
 const ARTIST_SQUARE_IMG_PATH = './public/images/artists/square/';

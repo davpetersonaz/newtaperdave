@@ -17,6 +17,11 @@ package-lock.json
 /.pnp
 .pnp.js
 /public/output/
+!public/files/*
+!public/images/artists/square/*
+!public/images/artists/wide/*
+!public/images/venues/*
+!public/music/*
 *.tsbuildinfo
 .vercel
 yarn-debug.log*

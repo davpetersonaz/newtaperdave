@@ -15,12 +15,12 @@ export default function FrequentBands({ bands }:{ bands:string[] }){
 		selectedBands.push(randomlogo);
 	}
 
-	const url = (process.env.ENVIRONMENT === 'VERCEL' ? 'https://taperdave.vercel.app' : 'https://localhost:3000');
+	const url = (process.env.ENVIRONMENT === 'VERCEL' ? 'https://taperdave.vercel.app' : 'http://localhost:3000');
 	return(
 		<>
 			{selectedBands.map((logo) => (
 				<div className="relative h-40 w-64 gap-4 mt-4" key={logo}>
-					<Link href={`${url}/showlist#${logoToArtistCamel(logo)}`} legacyBehavior>
+					<Link href={`${url}/showlist#${logoToArtistCamel(logo)}`}>
 						<Image src={logo} alt={logo} layout="fill" objectFit="contain" />
 					</Link>
 				</div>

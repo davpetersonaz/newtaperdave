@@ -1,4 +1,3 @@
-
 //app/showinfo/[artist]/[showdate]/[source]/page.tsx
 import Image from 'next/image';
 import Link from 'next/link';
@@ -12,11 +11,11 @@ export default async function Page({ params }: { params: { artist:string, showda
 	if (!showinfo) {
 		return <div>Show not found</div>;
 	}
-	
-	const artist_image = (showinfo.artist_square === '' || !showinfo.artist_square  
-			? (<p className='text-4xl font-bold'>{showinfo.artist}</p>) 
+
+	const artist_image = (showinfo.artist_square === '' || !showinfo.artist_square
+			? (<p className='text-4xl font-bold'>{showinfo.artist}</p>)
 			: (<Image src={showinfo.artist_square} alt={showinfo.artist || 'Artist'} height={showinfo.artist_square_h || 0} width={showinfo.artist_square_w || 0} className='mx-auto pb-4'/>) );
-	const venue_image = (showinfo.venue_logo === '' || !showinfo.venue_logo 
+	const venue_image = (showinfo.venue_logo === '' || !showinfo.venue_logo
 			?	(<p className='text-3xl font-bold pb-8'>{showinfo.venue}</p>)
 			:	(<Image src={showinfo.venue_logo} alt={showinfo.venue || 'Venue'} height={showinfo.venue_logo_h || 0} width={showinfo.venue_logo_w || 0} className='mx-auto pt-4 pb-8'/>) );
 	const pcloud_link = (showinfo.pcloudlink === '' || !showinfo.pcloudlink
@@ -32,7 +31,7 @@ export default async function Page({ params }: { params: { artist:string, showda
 					</div>
 				</>)
 			:	(<></>) );
-				
+
 	// Parse setlist safely into string[]
 	let setlist: string[];
 	try {
@@ -45,9 +44,9 @@ export default async function Page({ params }: { params: { artist:string, showda
 	const setlist_str = setlist.map((line, index) =>
 		line === '' ? <br key={index} /> : <li key={index}>{line}</li>
 	);
-	
+
 	return (
-		<div className='text-center'> 
+		<div className='text-center'>
 			<div className='grid grid-cols-2 gap-16'>
 				<div className='text-center'>
 					<div className='float-right pt-8'>
