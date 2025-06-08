@@ -11,7 +11,7 @@ export async function addShow(show: ShowInfo):Promise<number> {
 			venue_logo, venue_logo_h, venue_logo_w, city, city_state,
 			pcloudlink, archivelink, setlist, samplefile
 		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)`;
-//	console.log('query', query);
+//	console.info('query', query);
 	const values = [
 		sourceId,
 		show.artist || '',
@@ -35,25 +35,25 @@ export async function addShow(show: ShowInfo):Promise<number> {
 		show.samplefile || '',
 	];
 
-	console.log('addShow query:', query);
-	console.log('addShow values:', values);
+	console.info('addShow query:', query);
+	console.info('addShow values:', values);
 	const result = await conn.query(query, values);
-//	console.log('result', result);
+//	console.info('result', result);
 	return (result.rowCount ? result.rowCount : 0);
 }
 
 export async function removeAllShows(): Promise<number> {
 	const query = "DELETE FROM shows";
 	const result = await conn.query(query);
-//	console.log('result', result);
+//	console.info('result', result);
 	return (result.rowCount ? result.rowCount : 0);
 }
 
-export async function createCache(fetchXXX: () => Promise<ShowInfo[]>): Promise<void> {
+export async function createCache(fetchXXX:() => Promise<ShowInfo[]>, queryName:string): Promise<void> {
 	try {
 		const fetchArray = await fetchXXX();
 		if (!Array.isArray(fetchArray)) {
-			console.error(`Invalid fetchArray for ${fetchXXX.name}:`, fetchArray);
+			console.error(`Invalid fetchArray for ${queryName}:`, fetchArray);
 			return;
 		}
 		const query = `
@@ -62,12 +62,12 @@ export async function createCache(fetchXXX: () => Promise<ShowInfo[]>): Promise<
 			ON CONFLICT (query)
 			DO UPDATE SET result = EXCLUDED.result
 		`;
-		const values = [fetchXXX.name.toLowerCase(), JSON.stringify(fetchArray)];
+		const values = [queryName.toLowerCase(), JSON.stringify(fetchArray)];
 		const result = await conn.query(query, values);
 		if (result.rowCount !== null && result.rowCount > 0) {
-			console.log(`Cached: ${fetchXXX.name}, rows affected: ${result.rowCount}`);
+			console.info(`Cached: ${queryName}, rows affected: ${result.rowCount}`);
 		} else {
-			console.warn(`No rows affected for ${fetchXXX.name}`);
+			console.warn(`No rows affected for ${queryName}`);
 		}
 	} catch (error) {
 		console.error(`Failed to cache ${fetchXXX.name}:`, error);

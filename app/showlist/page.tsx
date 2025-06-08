@@ -1,4 +1,4 @@
-//app/showlist/byyear/page.tsx
+//app/showlist/page.tsx
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { generateShowList } from '@/showlist/components/ShowList';

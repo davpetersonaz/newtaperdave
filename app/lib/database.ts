@@ -78,21 +78,21 @@ export async function getFeaturedBands():Promise<string[]>{
 					ORDER BY artist_count DESC`;
 	const rows = await doSelect<{ artist_square:string; artist_count:number }>(query);
 	const namesOnly:string[] = rows.map(x => x.artist_square);
-	console.warn('namesOnly', namesOnly, typeof namesOnly);
+	console.info('namesOnly', namesOnly, typeof namesOnly);
 	return namesOnly;
 }
 
 export async function getQueryCache(querystring: string): Promise<string> {
-  const query = `SELECT result FROM query_cache WHERE query=$1`;
-  const values = [querystring.toLowerCase()];
-  const rows = await doSelect<{ result: string }>(query, values);
-  return rows.length > 0 ? rows[0].result : '';
+	const query = `SELECT result FROM query_cache WHERE query=$1`;
+	const values = [querystring.toLowerCase()];
+	const rows = await doSelect<{ result: string }>(query, values);
+	return rows.length > 0 ? rows[0].result : '';
 }
 
 export async function checkConnection(): Promise<void> {
     try {
         await conn.query('SELECT 1');
-        console.log('Database connected successfully');
+        console.info('Database connected successfully');
     } catch (error) {
         console.error('Database connection error:', error);
         throw error;

@@ -1,6 +1,4 @@
 //app/api/readshows/route.ts
-import fs from 'fs';
-import { existsSync } from 'fs';
 import fsp from 'fs/promises';
 import path from 'path';
 import { NextResponse } from 'next/server';
@@ -39,7 +37,7 @@ interface Links {
 }
 
 export async function GET(request: Request){
-	console.log('readShows called at:', new Date(), 'Environment:', process.env.NODE_ENV);
+	console.info('readShows called at:', new Date(), 'Environment:', process.env.NODE_ENV);
 	try{
 		//reset these
 		MISSING_ARCHIVE = [];
@@ -106,12 +104,12 @@ export async function GET(request: Request){
 				console.warn(`Missing city in file: ${filename}`);
 				continue;
 			}
-			console.warn('fileContents after extracting city:', fileContents);
+			console.info('fileContents after extracting city:', fileContents);
 			const { city, city_state } = getCity(cityLine.trim());
 			showInfo.city = city;
 			showInfo.city_state = city_state;
 			const { pcloud, archive } = getLinks(fileContents, logger);
-			console.warn('fileContents after extracting pcloud/archive:', fileContents);
+			console.info('fileContents after extracting pcloud/archive:', fileContents);
 			showInfo.pcloudlink = pcloud;
 			showInfo.archivelink = archive;
 			showInfo.setlist = JSON.stringify(getTheRest(fileContents));
@@ -140,11 +138,11 @@ export async function GET(request: Request){
 
 		// Create caches
 		await Promise.all([
-			createCache(getShowListAlpha),
-			createCache(getShowListChrono),
-			createCache(getShowListCity),
-			createCache(getShowListSource),
-			createCache(getShowListVenue),
+			createCache(getShowListAlpha, 'getShowListAlpha'),
+			createCache(getShowListChrono, 'getShowListChrono'),
+			createCache(getShowListCity, 'getShowListCity'),
+			createCache(getShowListSource, 'getShowListSource'),
+			createCache(getShowListVenue, 'getShowListVenue'),
 		]);
 
 		return NextResponse.json(`imported ${inc} shows into db`);
