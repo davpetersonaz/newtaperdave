@@ -171,7 +171,7 @@ async function getFilenames(): Promise<string[]> {
 async function readFile(filename:string): Promise<string[]> {
 	try{
 		const fileContents = await fsp.readFile(PATH + filename, 'utf-8');
-		return fileContents.split('\n');
+		return fileContents.split(/\r?\n/);
 	}catch(error){
 		console.error(`Error reading file ${filename}:`, error);
 		return [];
