@@ -362,8 +362,8 @@ function getLinks(fileContents:string[], logger:string): Links {
 function getTheRest(fileContents:string[]): string[] {
 	const result: string[] = [];
 	while(fileContents.length > 0){
-		const line = fileContents.shift()?.trim();
-		if (line){ result.push(line); }
+		const line = fileContents.shift()?.trim() ?? ''; // Use '' for undefined lines
+		result.push(line); // Include all lines, empty or not
 	}
 	return result;
 }
