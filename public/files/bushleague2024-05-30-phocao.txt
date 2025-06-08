@@ -1,7 +1,8 @@
 Bush League
 05-30-24
-Pho Cao
+Pho Cao Restaurant
 Scottsdale, AZ
+https://archive.org/details/bushleague2024-05-30
 https://u.pcloud.link/publink/show?code=XZhvAO0Z4Wuq6tXTfeh4utWMc1e8bm9s1XvV
 
 [show] (86:09)
@@ -21,3 +22,5 @@ Hypervisor opened the show.
 source: Golden Age Project FC4 mics w/ cardioid caps > Rockville 100% copper 20' XLR mic cables > ZoomH6 XLR jacks > Lexar Professional 633x 32gb 95-mb/s SD-HC-I card > audacity > you
 location: middle of room, 20' from stage, 8' mic stand
 taper: davpeterson
+
+The Bush League is a psychedelic jam band hailing from Tucson AZ.
