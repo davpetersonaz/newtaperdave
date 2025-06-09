@@ -42,11 +42,15 @@ export async function addShow(show: ShowInfo):Promise<number> {
 	return (result.rowCount ? result.rowCount : 0);
 }
 
-export async function removeAllShows(): Promise<number> {
-	const query = "DELETE FROM shows";
-	const result = await conn.query(query);
-//	console.info('result', result);
-	return (result.rowCount ? result.rowCount : 0);
+export async function removeAllShows(): Promise<void> {
+	try {
+		const query = `TRUNCATE TABLE shows RESTART IDENTITY`;
+		const result = await conn.query(query);
+		console.info('removeAllShows: Table truncated, rows affected:', result.rowCount);
+	} catch (error) {
+		console.error('Failed to remove all shows:', error);
+		throw error;
+	}
 }
 
 export async function createCache(fetchXXX:() => Promise<ShowInfo[]>, queryName:string): Promise<void> {
