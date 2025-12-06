@@ -4,13 +4,15 @@ import Link from 'next/link';
 import { getShow } from '@/lib/database';
 import { ShowInfo } from '@/types/ShowInfoType';
 
-export default async function Page({ params }: { params: { artist:string, showdate:string, source:string } }){
-	console.info('showinfo', params.artist, params.showdate, params.source);
-	if (!params.artist || !params.showdate || !params.source) {
+export default async function Page({ params }: { params: Promise<{ artist:string; showdate:string; source:string }> }){
+	const { artist, showdate, source } = await params;
+	console.info('showinfo', artist, showdate, source);
+	if (!artist || !showdate || !source) {
 		return <div>Invalid parameters</div>;
 	}
 
-	const showinfo: ShowInfo | null = await getShow(decodeURIComponent(params.artist), params.showdate, params.source);
+	const decodedArtist = decodeURIComponent(artist);
+	const showinfo: ShowInfo | null = await getShow(decodedArtist, showdate, source);
 	console.info('showinfo', showinfo);
 	if (!showinfo) {
 		return <div>Show not found</div>;
