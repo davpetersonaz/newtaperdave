@@ -9,8 +9,9 @@ import { getQueryCache } from '@/lib/database';
 import { imageSize } from 'image-size';
 import path from 'path';
 import { promises as fs } from 'fs';
+import React from 'react';
 
-export async function generateShowList(groupByKey:keyof ShowListItem | 'year', cacheName:string):Promise<JSX.Element[]> {
+export async function generateShowList(groupByKey:keyof ShowListItem | 'year', cacheName:string):Promise<React.ReactNode[]> {
     const cached = await getQueryCache(cacheName);
     if (!cached) {
         throw new Error(`Cache not found for ${cacheName}`);
@@ -18,7 +19,7 @@ export async function generateShowList(groupByKey:keyof ShowListItem | 'year', c
     const showlist:ShowListItem[] = JSON.parse(cached) as ShowListItem[];
     console.warn('showlist', showlist.length);
 
-    const output:JSX.Element[] = [];
+    const output:React.ReactNode[] = [];
     output.push(
         <div key="header">
             <p className="text-4xl font-bold pb-8">Shows I Have Taped</p>
@@ -26,7 +27,7 @@ export async function generateShowList(groupByKey:keyof ShowListItem | 'year', c
     );
 
     let currentGroup = 'unset';
-    let currentGroupHeader:JSX.Element = <p className="text-3xl font-bold">{currentGroup}</p>;
+    let currentGroupHeader:React.ReactNode = <p className="text-3xl font-bold">{currentGroup}</p>;
     let shows:ShowLine[] = [];
 
     for (const show of showlist) {

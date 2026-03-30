@@ -1,13 +1,12 @@
-import {nextui} from '@nextui-org/theme';
-
+// tailwind.config.ts
+import { heroui } from '@heroui/theme';
 import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./node_modules/@nextui-org/theme/dist/components/(dropdown|skeleton|menu|divider|popover|button|ripple|spinner).js"
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./node_modules/@heroui/theme/dist/components/**/*.js"
   ],
   theme: {
     extend: {
@@ -17,9 +16,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [nextui()],
-  utilities: {
-    border: ['responsive'], /* still can't get borders to display?? */
-  }
+  plugins: [heroui()],
 };
+
 export default config;

@@ -1,5 +1,6 @@
-
 //app/types/ShowInfoType.ts
+import React from 'react';
+
 export type ShowInfo = {
 	sources?: number;
 	artist?: string;
@@ -36,7 +37,7 @@ export interface ShowLine {
     city: string;
     source_num: number;
     sourcetext: string;
-    archivelink: JSX.Element;
-    pcloudlink: JSX.Element;
-    samplefile: JSX.Element;
+    archivelink: React.ReactNode;
+    pcloudlink: React.ReactNode;
+    samplefile: React.ReactNode;
 }
