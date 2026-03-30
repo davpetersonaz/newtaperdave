@@ -6,17 +6,15 @@ const nextConfig = {
         ignoreDuringBuilds: true
     },
 
-    experimental: {
-        outputFileTracingExcludes: {
-            '**/*': [
-                './public/music/**/*',
-                './public/files/**/*',
-                './public/images/**/*'
-            ],
-        },
+    outputFileTracingExcludes: {
+        '**/*': [
+            './public/music/**/*',
+            './public/files/**/*',
+            './public/images/**/*'
+        ],
     },
 
-    // Optional: Increase output file tracing root if needed
+    // Increase output file tracing root if needed
     outputFileTracingRoot: process.cwd()
 };
 
