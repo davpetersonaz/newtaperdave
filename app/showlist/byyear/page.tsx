@@ -2,8 +2,10 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { generateShowList } from '@/showlist/components/ShowList';
-import { getShowListChrono } from '@/lib/database';
-import ScrollToHash from '@/showlist/components/ScrollToHash';
+import ScrollToHash from '@/components/ScrollToHash';
+import AdminRegenerateButton from '@/components/AdminRegenerateButton';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata:Metadata = {
 	title: 'List of Shows by Year',
@@ -17,8 +19,8 @@ export default async function Page(){
 			<div className='text-center pt-4'>
 				{output}
 			</div>
-			<div className="relative">
-				<Link href="/api/readshows" prefetch={false} className="float-right">Regenerate Shows</Link>
+			<div className="text-right mt-6">
+				<AdminRegenerateButton />
 			</div>
 		</>
 	);

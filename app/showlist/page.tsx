@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { generateShowList } from '@/showlist/components/ShowList';
 import { getShowListAlpha } from '@/lib/database';
-import ScrollToHash from '@/showlist/components/ScrollToHash';
+import ScrollToHash from '@/components/ScrollToHash';
 
 export const metadata:Metadata = {
 	title: 'List of Shows by Artist',

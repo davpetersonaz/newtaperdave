@@ -37,6 +37,12 @@ interface Links {
 }
 
 export async function GET(request: Request){
+    const { searchParams } = new URL(request.url);
+    const secret = searchParams.get('secret');
+    if (secret !== process.env.RESET_SECRET) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
 	console.info('readShows called at:', new Date(), 'Environment:', process.env.NODE_ENV);
 	try{
 		//reset these
@@ -154,24 +160,23 @@ export async function GET(request: Request){
 }
 
 async function getFilenames(): Promise<string[]> {
-	const dir = path.resolve(PATH);
-//	console.info('dir', dir);
 	try{
-		const filenames = await fsp.readdir(dir);
-		// console.info('filenames', filenames);
-		return filenames;
+		const filenames = await fsp.readdir(PATH);
+		console.info(`Found ${filenames.length} files in ${PATH}`);
+		return filenames.filter(f => f.endsWith('.txt') || f.endsWith('.TXT'));
 	}catch(error){
-		console.error(`Error reading directory ${dir}:`, error);
+		console.error(`Error reading directory ${PATH}:`, error);
 		return [];
 	}
 }
 
 async function readFile(filename:string): Promise<string[]> {
+	const fullPath = path.join(PATH, filename);
 	try{
-		const fileContents = await fsp.readFile(PATH + filename, 'utf-8');
+		const fileContents = await fsp.readFile(fullPath, 'utf-8');
 		return fileContents.split(/\r?\n/);
 	}catch(error){
-		console.error(`Error reading file ${filename}:`, error);
+		console.error(`Error reading file ${fullPath}:`, error);
 		return [];
 	}
 }
@@ -249,14 +254,14 @@ async function getArtistImages(artist: string): Promise<ArtistImages>{
 		const squareFiles = (await fsp.readdir(ARTIST_SQUARE_IMG_PATH)).filter((fn) => fn.startsWith(wip));
 		console.info('squareFiles filtered:', squareFiles);
 		if(squareFiles.length > 0){
-			result.square_image = ARTIST_SQUARE_IMG_PATH + squareFiles[0];
+			const filename = squareFiles[0];
+			const fullPath = path.join(ARTIST_SQUARE_IMG_PATH, filename);
 			console.info('result.square_image:', result.square_image);
-			const dimensions = sizeOf(result.square_image);
+			const dimensions = sizeOf(fullPath);
 			console.info('dimensions:', dimensions);
+			result.square_image = `/images/artists/square/${filename}`;
 			result.square_height = dimensions.height!;
 			result.square_width = dimensions.width!;
-			result.square_image = result.square_image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
-		}else{
 			console.warn('No square image found for:', artist, wip);
 			MISSING_ARTIST_SQUARE_IMG.push(`${artist} :: ${wip}`);
 		}
@@ -269,13 +274,13 @@ async function getArtistImages(artist: string): Promise<ArtistImages>{
 		const wideFiles = (await fsp.readdir(ARTIST_WIDE_IMG_PATH)).filter((fn) => fn.startsWith(wip));
 		console.info('wideFiles filtered:', wideFiles);
 		if(wideFiles.length > 0){
-			result.wide_image = ARTIST_WIDE_IMG_PATH + wideFiles[0];
-			console.info('result.wide_image:', result.wide_image);
-			const dimensions = sizeOf(result.wide_image);
+			const filename = wideFiles[0];
+			const fullPath = path.join(ARTIST_WIDE_IMG_PATH, filename);
+			const dimensions = sizeOf(fullPath);
 			console.info('dimensions:', dimensions);
+			result.wide_image =  `/images/artists/wide/${filename}`;
 			result.wide_height = dimensions.height!;
 			result.wide_width = dimensions.width!;
-			result.wide_image = result.wide_image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
 		}else{
 			console.warn('No wide image found for:', artist, wip);
 			MISSING_ARTIST_WIDE_IMG.push(`${artist} :: ${wip}`);
@@ -310,11 +315,12 @@ async function getVenue(line:string, logger:string): Promise<Venue>{
 	try{
 		const files = (await fsp.readdir(VENUE_IMG_PATH)).filter((fn) => fn.startsWith(stripped));
 		if(files.length > 0){
-			result.image = VENUE_IMG_PATH + files[0];
-			const dimensions = sizeOf(result.image);
+			const filename = files[0];
+			const fullPath = path.join(VENUE_IMG_PATH, filename);
+			const dimensions = sizeOf(fullPath);
+			result.image = `/images/venues/${filename}`;
 			result.height = dimensions.height!;
 			result.width = dimensions.width!;
-			result.image = result.image.substring(8);//remove leading './public', which was required to retrieve the file (but not to display)
 		}else{
 			MISSING_VENUE_IMG.push(`${stripped} :: ${logger}`);
 		}
@@ -372,15 +378,15 @@ async function getSampleFile(artist:string, showdate:string, showdateplus:string
 	const artist_stripped = strip(artist_temp).toLowerCase();
 	const possibleSampleFile = artist_stripped + showdate + showdateplus + '.mp3';
 	console.info('possibleSampleFile', possibleSampleFile);
-	const filePath = MP3_PATH + possibleSampleFile;
+	const filePath = path.join(MP3_PATH, possibleSampleFile);
 	try {
 		await fsp.access(filePath);
-		result = filePath.substring(8); // Remove './public' from path-joined url
+		return `/music/${possibleSampleFile}`;
 	} catch (error) {
 		console.warn('MISSING: sample file', possibleSampleFile);
 		MISSING_SAMPLES.push(`${possibleSampleFile} :: ${artist} :: ${showdate}`);
+		return '';
 	}
-	return result;
 }
 
 async function writeLogFile(filename:string, data:string[]): Promise<void> {
@@ -399,12 +405,12 @@ async function writeLogFile(filename:string, data:string[]): Promise<void> {
 	}
 }
 
-const ARTIST_SQUARE_IMG_PATH = './public/images/artists/square/';
-const ARTIST_WIDE_IMG_PATH = './public/images/artists/wide/';
-const MP3_PATH = './public/music/';
-const OUTPUT_PATH = './public/output/';
-const PATH = './public/files/';
-const VENUE_IMG_PATH = './public/images/venues/';
+const ARTIST_SQUARE_IMG_PATH = path.join(process.cwd(), 'public/images/artists/square/');
+const ARTIST_WIDE_IMG_PATH = path.join(process.cwd(), 'public/images/artists/wide/');
+const MP3_PATH = path.join(process.cwd(), 'public/music/');
+const OUTPUT_PATH = path.join(process.cwd(), 'public/output/');
+const PATH = path.join(process.cwd(), 'public/files/');
+const VENUE_IMG_PATH = path.join(process.cwd(), 'public/images/venues/');
 
 //logging files
 let MISSING_ARCHIVE: string[] = [];

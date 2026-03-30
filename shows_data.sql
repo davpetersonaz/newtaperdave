@@ -1,0 +1,1 @@
+COPY public.shows (show_id, artist, artist_sort, showdate, venue, city, city_state, sources, pcloudlink, archivelink, samplefile, venue_logo, venue_logo_h, venue_logo_w, artist_wide, artist_wide_h, artist_wide_w, artist_square, artist_square_h, artist_square_w, setlist) FROM stdin;

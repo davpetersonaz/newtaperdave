@@ -3,10 +3,11 @@ import { Pool } from "pg";
 import 'dotenv/config';
 
 // Convert port from string | undefined to number | undefined
-const port = process.env.PGSQL_PORT ? parseInt(process.env.PGSQL_PORT, 10) : 5432;
+// const port = process.env.PGSQL_PORT ? parseInt(process.env.PGSQL_PORT, 10) : 5432;
 const conn: Pool = new Pool({
-    connectionString: process.env.DB_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    connectionString: process.env.DB_URL + (process.env.DB_URL?.includes('?') ? '&' : '?') + 'sslmode=disable',
+    ssl: false,
+    connectionTimeoutMillis: 5000
 });
 
 // Generic database query function
