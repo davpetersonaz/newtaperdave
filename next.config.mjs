@@ -1,21 +1,14 @@
-//next.config.mjs
+// eslint.config.mjs
+import js from "@eslint/js";
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-    eslint: {
-        ignoreDuringBuilds: true
+export default [
+  js.configs.recommended,
+  {
+    ignores: [".next/**", "node_modules/**"],
+    rules: {
+      "no-unused-vars": "off",
+      "no-undef": "off",
+      "react/react-in-jsx-scope": "off",
     },
-
-    outputFileTracingExcludes: {
-        '**/*': [
-            './public/music/**/*',
-            './public/files/**/*',
-            './public/images/**/*'
-        ],
-    },
-
-    // Increase output file tracing root if needed
-    outputFileTracingRoot: process.cwd()
-};
-
-export default nextConfig;
+  },
+];

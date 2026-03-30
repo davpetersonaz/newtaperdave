@@ -1,17 +1,19 @@
 // app/lib/regenerateShows.ts
 import fsp from 'fs/promises';
-import path from 'path';
 import sizeOf from 'image-size';
-import { strip } from './util';
+import path from 'path';
+
 import { ShowInfo } from '@/types/ShowInfoType';
+
 import { 
-    removeAllShows, addShow, createCache,
-    getShowListAlpha, getShowListChrono, getShowListCity, getShowListSource, getShowListVenue 
+    addShow, createCache, getShowListAlpha, getShowListChrono, getShowListCity, 
+    getShowListSource, getShowListVenue, removeAllShows
 } from './database';
 import { 
-    GAP, AT853, MATRIX_WITH_GAP, MATRIX_WITH_AT853, MATRIX_WITH_H5, 
-    MATRIX_WITH_H6, MATRIX_WITH_H4, SBD, MBHO, OTHER, ZOOMH5, ZOOMH6, ZOOMH4 
+    AT853, GAP, MATRIX_WITH_AT853, MATRIX_WITH_GAP, MATRIX_WITH_H4, MATRIX_WITH_H5, 
+    MATRIX_WITH_H6, MBHO, OTHER, SBD, ZOOMH4, ZOOMH5, ZOOMH6
 } from './database';
+import { strip } from './util';
 
 const PATH                   = path.join(process.cwd(), 'public/files/');
 const ARTIST_SQUARE_IMG_PATH = path.join(process.cwd(), 'public/images/artists/square/');
@@ -19,13 +21,13 @@ const ARTIST_WIDE_IMG_PATH   = path.join(process.cwd(), 'public/images/artists/w
 const MP3_PATH               = path.join(process.cwd(), 'public/music/');
 const VENUE_IMG_PATH         = path.join(process.cwd(), 'public/images/venues/');
 
-let MISSING_ARCHIVE: string[] = [];
-let MISSING_ARTIST_SQUARE_IMG: string[] = [];
-let MISSING_ARTIST_WIDE_IMG: string[] = [];
-let MISSING_PCLOUD: string[] = [];
-let MISSING_SAMPLES: string[] = [];
-let MISSING_VENUE_IMG: string[] = [];
-let UNKNOWN_SOURCE: string[] = [];
+const MISSING_ARCHIVE: string[] = [];
+const MISSING_ARTIST_SQUARE_IMG: string[] = [];
+const MISSING_ARTIST_WIDE_IMG: string[] = [];
+const MISSING_PCLOUD: string[] = [];
+const MISSING_SAMPLES: string[] = [];
+const MISSING_VENUE_IMG: string[] = [];
+const UNKNOWN_SOURCE: string[] = [];
 
 export async function regenerateShows() {
     console.info('Starting full regeneration at:', new Date());
@@ -208,7 +210,8 @@ async function getArtistImages(artist: string) {
             result.artist_square_h = dim.height!;
             result.artist_square_w = dim.width!;
         }
-    } catch (e) {
+    } catch (error) {
+        console.error(`Error loading square image for ${artist}:`, error);
         MISSING_ARTIST_SQUARE_IMG.push(`${artist} :: ${wip}`);
     }
 
@@ -222,7 +225,8 @@ async function getArtistImages(artist: string) {
             result.artist_wide_h = dim.height!;
             result.artist_wide_w = dim.width!;
         }
-    } catch (e) {
+    } catch (error) {
+        console.error(`Error loading wide image for ${artist}:`, error);
         MISSING_ARTIST_WIDE_IMG.push(`${artist} :: ${wip}`);
     }
 
@@ -252,7 +256,8 @@ async function getVenue(line: string, logger: string) {
             result.height = dim.height!;
             result.width = dim.width!;
         }
-    } catch (e) {
+    } catch (error) {
+        console.error(`Error loading venue image for ${logger}:`, error);
         MISSING_VENUE_IMG.push(`${stripped} :: ${logger}`);
     }
     return result;

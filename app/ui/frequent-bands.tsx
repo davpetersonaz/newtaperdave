@@ -2,6 +2,7 @@
 import React from 'react';
 import Image from "next/legacy/image";
 import Link from 'next/link';
+
 import { logoToArtistCamel } from '@/lib/util'; 
 
 export default function FrequentBands({ bands }:{ bands:string[] }){

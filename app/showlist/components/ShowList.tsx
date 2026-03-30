@@ -1,15 +1,18 @@
 //app/showlist/components/ShowList.tsx
-import { ShowListItem, ShowLine } from '@/types/ShowInfoType';
-import { strip } from '../../lib/util';
-import Link from 'next/link';
+import React from 'react';
 import Image from "next/image";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Link from 'next/link';
+
 import { faFileArrowDown, faFileZipper, faPlay } from '@fortawesome/free-solid-svg-icons';
-import { getQueryCache } from '@/lib/database';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { promises as fs } from 'fs';
 import { imageSize } from 'image-size';
 import path from 'path';
-import { promises as fs } from 'fs';
-import React from 'react';
+
+import { getQueryCache } from '@/lib/database';
+import { ShowLine,ShowListItem } from '@/types/ShowInfoType';
+
+import { strip } from '../../lib/util';
 
 export async function generateShowList(groupByKey:keyof ShowListItem | 'year', cacheName:string):Promise<React.ReactNode[]> {
     const cached = await getQueryCache(cacheName);
@@ -173,6 +176,7 @@ async function getImageInfo(show:ShowListItem, groupByKey:keyof ShowListItem):Pr
                     width = dimensions.width;
                     height = dimensions.height;
                 } catch (error) {
+                    console.warn('unable to find cities-image,', error);
                     // If the file doesn't exist, return undefined for URL and dimensions
                     url = undefined;
                     width = undefined;
@@ -187,40 +191,4 @@ async function getImageInfo(show:ShowListItem, groupByKey:keyof ShowListItem):Pr
     }
 
     return { url, width, height };
-}
-
-// Helper function to get the image URL
-function getImageUrl(show: ShowListItem, groupByKey: keyof ShowListItem): string | undefined {
-    switch (groupByKey) {
-        case 'venue':
-            return show.venue_logo;
-        case 'artist':
-            return show.artist_wide;
-        default:
-            return undefined;
-    }
-}
-
-// Helper function to get the image height
-function getImageHeight(show: ShowListItem, groupByKey: keyof ShowListItem): number | undefined {
-    switch (groupByKey) {
-        case 'venue':
-            return show.venue_logo_h;
-        case 'artist':
-            return show.artist_wide_h;
-        default:
-            return undefined;
-    }
-}
-
-// Helper function to get the image width
-function getImageWidth(show: ShowListItem, groupByKey: keyof ShowListItem): number | undefined {
-    switch (groupByKey) {
-        case 'venue':
-            return show.venue_logo_w;
-        case 'artist':
-            return show.artist_wide_w;
-        default:
-            return undefined;
-    }
 }

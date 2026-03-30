@@ -1,8 +1,9 @@
 //app/header.tsx
-import Link from 'next/link';
-import { FaTwitter, FaGithub } from 'react-icons/fa';
-import MyDropdown from './ui/dropdown';
 import { ComponentType } from 'react';
+import { FaGithub,FaTwitter } from 'react-icons/fa';
+import Link from 'next/link';
+
+import MyDropdown from './ui/dropdown';
 
 // Define the Header component
 export default function Header(){

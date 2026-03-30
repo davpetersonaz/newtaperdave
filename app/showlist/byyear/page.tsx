@@ -1,7 +1,8 @@
 //app/showlist/byyear/page.tsx
 import { Metadata } from 'next';
-import { generateShowList } from '@/showlist/components/ShowList';
+
 import ScrollToHash from '@/components/ScrollToHash';
+import { generateShowList } from '@/showlist/components/ShowList';
 
 export const dynamic = 'force-dynamic';
 

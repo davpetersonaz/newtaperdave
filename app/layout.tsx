@@ -1,13 +1,17 @@
+//app/layout.tsx
+import { Suspense } from 'react';
+import { Metadata } from 'next';
+
+import { config } from "@fortawesome/fontawesome-svg-core";
+
+import { NavLinks } from './ui/nav-links';
+import Footer from './footer';
+import Header from './header';
+import Loading from './loading';
 
 import "./globals.css";
-import { NavLinks } from './ui/nav-links';
-import Header from './header';
-import Footer from './footer';
-import { Metadata } from 'next';
-import { Suspense } from 'react';
-import Loading from './loading';
 import "@fortawesome/fontawesome-svg-core/styles.css"; // import Font Awesome CSS
-import { config } from "@fortawesome/fontawesome-svg-core";
+
 config.autoAddCss = false; // Tell Font Awesome to skip adding the CSS automatically since it's being imported above
 
 export const metadata: Metadata = {
@@ -29,7 +33,9 @@ export default function RootLayout({
 				<Header />
 				<NavLinks />
 				<Suspense fallback={<Loading />}>
-					<main className="mb-auto relative flex pb-20 flex-col mr-6 ml-6 pt-17">{children}</main>
+					<main className="mb-auto relative flex pb-20 flex-col mr-6 ml-6 pt-17">
+						{children}
+					</main>
 				</Suspense>
 				<Footer />
 			</body>

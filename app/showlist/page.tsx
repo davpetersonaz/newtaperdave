@@ -1,8 +1,9 @@
 // app/showlist/page.tsx
 import { Metadata } from 'next';
-import { generateShowList } from '@/showlist/components/ShowList';
+
 import ScrollToHash from '@/components/ScrollToHash';
 import { regenerateShows } from '@/lib/regenerateShows';
+import { generateShowList } from '@/showlist/components/ShowList';
 
 export const metadata: Metadata = {
 	title: 'List of Shows by Artist',
