@@ -1,10 +1,7 @@
 //app/showlist/bysource/page.tsx
 import { Metadata } from 'next';
-import Link from 'next/link';
 import { generateShowList } from '../components/ShowList';
-import { getShowListSource } from '../../lib/database';
 import ScrollToHash from '@/components/ScrollToHash';
-import AdminRegenerateButton from '@/components/AdminRegenerateButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,9 +16,6 @@ export default async function Page(){
 			<ScrollToHash />
 			<div className='text-center pt-4'>
 				{output}
-			</div>
-			<div className="text-right mt-6">
-				<AdminRegenerateButton />
 			</div>
 		</>
 	);
