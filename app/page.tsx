@@ -14,7 +14,7 @@ export default async function Page(){
 
 	return (
 		<div className="min-h-screen bg-white" suppressHydrationWarning>
-			<div className="text-center pt-4 pb-6">
+			<div className="text-center pb-6">
 				<h1 className="text-5xl font-bold tracking-tight text-gray-900">
 					Shows I Have Taped
 				</h1>
