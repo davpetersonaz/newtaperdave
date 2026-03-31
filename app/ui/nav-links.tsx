@@ -1,14 +1,14 @@
-
+//app/ui/nav-links.tsx
 'use client';
- 
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
- 
+
 export function NavLinks(){
 	const pathname = usePathname();
 //	console.info('pathname', pathname);
 	return (
-		<nav className='p-6'>
+		<nav className='p-3'>
 			<Link className={`link ${pathname === '/' ? 'active' : ''}`} href="/">
 				<span className='underline'>Home</span>
 			</Link>

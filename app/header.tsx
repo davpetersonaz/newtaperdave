@@ -3,7 +3,7 @@ import { ComponentType } from 'react';
 import { FaGithub,FaTwitter } from 'react-icons/fa';
 import Link from 'next/link';
 
-import MyDropdown from './ui/dropdown';
+import ShowlistDropdown from './ui/dropdown';
 
 // Define the Header component
 export default function Header(){
@@ -12,7 +12,7 @@ export default function Header(){
 			<div className="container mx-auto px-4 flex justify-between items-center">
 				<div className="flex flex-row gap-x-6">
 					<Link href="/" className="p-1.5 text-xl font-semibold">Taper Dave</Link>
-					<MyDropdown />
+					<ShowlistDropdown />
 				</div>
 				{/* Navigation buttons
 				<nav className="hidden md:block">

@@ -28,12 +28,12 @@ export default function RootLayout({
 	}: Readonly<{ children: React.ReactNode; }>
 ) {
 	return (
-		<html lang="en">
-			<body className="flex flex-col min-h-screen text-gray-900 bg-gray-100">
+		<html lang="en" className="bg-white">
+			<body className="flex flex-col min-h-screen text-gray-900 bg-white">
 				<Header />
 				<NavLinks />
 				<Suspense fallback={<Loading />}>
-					<main className="mb-auto relative flex pb-20 flex-col mr-6 ml-6 pt-17">
+					<main className="mb-auto relative flex pb-20 flex-col mr-6 ml-6">
 						{children}
 					</main>
 				</Suspense>
