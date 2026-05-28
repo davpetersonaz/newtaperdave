@@ -1,7 +1,8 @@
 //app/ui/dropdown.tsx
 'use client';
-import {Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger} from "@heroui/react";
 import Link from 'next/link';
+
+import {Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger} from "@heroui/react";
 
 const ShowlistDropdown = () => {
 	return (
