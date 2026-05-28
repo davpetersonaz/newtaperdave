@@ -110,7 +110,7 @@ export async function generateShowList(groupByKey:keyof ShowListItem | 'year', c
 				? ( <Link href={show.pcloudlink} target="_blank"> <FontAwesomeIcon icon={faFileArrowDown} /> </Link> )
 				: ( <></> ),
             samplefile: show.samplefile && show.samplefile !== '' && show.artist && show.showdate && show.sources !== undefined
-				? ( <Link href={`/showinfo/${encodeURIComponent(show.artist)}/${encodeURIComponent(show.showdate)}/${encodeURIComponent(show.sources.toString())}`} target="_blank">
+				? ( <Link href={`/showinfo/${encodeURIComponent(show.artist)}/${encodeURIComponent(show.showdate)}/${encodeURIComponent(show.sources.toString())}`}>
                         <FontAwesomeIcon icon={faPlay} />
                     </Link> )
 				: ( <></> )
