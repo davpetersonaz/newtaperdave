@@ -56,8 +56,10 @@ export default async function Page(){
 					(the microphones, the placement, the room, me, the soundguy, the amps, etc).{' '}
 					Generally, the older the recording, the higher the likelihood it might not be &quot;that great&quot;,{' '}
 					I have provided samples of each show so you can take a quick listen before downloading.{' '}
-					For your reference, the progression of equipment I have used started with the ZoomH4n, then the ZoomH6 for a brief period, then the ZoomH5,{' '}
-					then I purchased some good external mics, first were Audio Technica 853 microphones, and most recently my new Golden Age Project FC4 condenser mics.
+					For your reference, the progression of microphones I have used started with the ZoomH4n (internal microphones),{' '}
+					then the ZoomH6 for a brief period, then the ZoomH5 (internal mics),{' '}
+					then I purchased some good external mics, first the Audio Technica 853 microphones, 
+					and then the Golden Age Project FC4 condenser mics, and most recently the Warm Audio WM-84 condenser mics.
 				</p>
 				<p className="text-lg pb-4">
 					<span className="italic">Download, listen, share with your friends!</span> and, most importantly,{' '}
