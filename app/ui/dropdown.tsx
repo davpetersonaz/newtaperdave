@@ -1,17 +1,24 @@
 //app/ui/dropdown.tsx
 'use client';
-import Link from 'next/link';
+import { useState } from 'react';
 
 import {Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger} from "@heroui/react";
 
 const ShowlistDropdown = () => {
+	const [isOpen, setIsOpen] = useState(false);
 	return (
-		<Dropdown>
+		<Dropdown isOpen={isOpen} onOpenChange={setIsOpen}>
 			<DropdownTrigger>
 				<Button variant="solid" 
 					className="rounded-md text-xl font-semibold bg-gray-700 hover:bg-gray-600 text-white border border-gray-500 h-11 px-6 flex items-center justify-center"
+					onMouseEnter={() => setIsOpen(true)}
+					onMouseLeave={() => setIsOpen(false)}
+					onClick={() => {
+						// Clicking the button goes to default view
+						window.location.href = "/showlist/byyear";
+					}}
 				>
-					<Link href="/showlist/byyear" className="block w-full h-full flex items-center justify-center">ShowList</Link>
+          			ShowList
 				</Button>
 			</DropdownTrigger>
 			<DropdownMenu aria-label="ShowList" className="bg-gray-800 text-white min-w-[200px]">
@@ -33,6 +40,6 @@ const ShowlistDropdown = () => {
 			</DropdownMenu>
 		</Dropdown>
 	);
-}
+};
 
 export default ShowlistDropdown;
